@@ -12,6 +12,12 @@ alacritty
 kitty
 fish
 
+# ── Fonts & Icons ──────────────────────────────────────────────
+google-noto-color-emoji-fonts
+google-noto-emoji-fonts
+fontawesome-fonts
+fira-code-fonts
+
 # ── Dependencies ───────────────────────────────────────────────
 libnotify
 bluez
