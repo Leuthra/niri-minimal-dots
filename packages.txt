@@ -39,7 +39,7 @@ btop
 firefox
 fastfetch
 gnome-keyring
-polkit-gnome
+polkit-kde
 dbus-daemon
 
 # ── Audio & Video ──────────────────────────────────────────────

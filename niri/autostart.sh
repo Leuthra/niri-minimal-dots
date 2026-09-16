@@ -37,4 +37,4 @@ wl-paste --watch cliphist store &
 waybar &
 
 # Polkit
-/usr/libexec/polkit-gnome-authentication-agent-1 &
+/usr/libexec/polkit-kde-authentication-agent-1 &
