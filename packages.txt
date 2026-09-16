@@ -21,6 +21,9 @@ NetworkManager
 network-manager-applet
 nm-connection-editor
 python3
+unzip
+p7zip
+unrar
 
 # ── Utilities ──────────────────────────────────────────────────
 wl-clipboard

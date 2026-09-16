@@ -8,7 +8,7 @@ if status is-interactive
     # Defaults
     set -gx TERMINAL alacritty
     set -gx EDITOR nano
-    set -gx VISUAL $EDITOR
+    set -gx VISUAL nano
     set -gx PAGER less
 
     # Paths
