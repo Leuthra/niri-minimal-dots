@@ -57,6 +57,12 @@ if [ -f "$DOTFILES_DIR/packages.txt" ]; then
             warn "Instalasi paket gagal. Periksa nama paket Fedora di packages.txt."
             exit 1
         fi
+        
+        # Enable bluetooth service if installed
+        if command -v bluetoothctl >/dev/null 2>&1; then
+            log "Mengaktifkan service Bluetooth..."
+            sudo systemctl enable --now bluetooth.service
+        fi
     fi
 else
     warn "packages.txt tidak ditemukan, melewati instalasi paket."

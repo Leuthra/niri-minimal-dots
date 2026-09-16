@@ -1,7 +1,7 @@
 [Icon Theme]
 Name=Local Niri Icons
 Comment=Local icons and cursor themes for niri session
-Inherits=Bibata-Modern-Classic
+Inherits=Adwaita
 Directories=48x48
 
 [48x48]

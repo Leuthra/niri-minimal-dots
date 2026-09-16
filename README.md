@@ -76,7 +76,6 @@ That's it. The installer handles:
 - Portal configuration
 - Script permissions
 - Fish as default shell
-- SDDM enablement
 
 ---
 
@@ -230,11 +229,11 @@ The following fonts are required (installed by `packages.txt`):
 
 | Font | Package | Used By |
 |------|---------|---------|
-| FiraCode Nerd Font | `ttf-firacode-nerd` | Alacritty, Kitty, Waybar |
-| JetBrainsMono Nerd Font | `ttf-jetbrains-mono-nerd` | Mako notifications |
-| Symbols Nerd Font | `ttf-nerd-fonts-symbols` | Waybar icon fallback |
-| Noto Sans Emoji | `noto-fonts-emoji` | Emoji rendering |
-| DejaVu Sans | (base system) | Fuzzel launcher |
+| Cascadia Code NF | `cascadia-code-nf-fonts` | Alacritty, Kitty, Waybar, Mako, Fuzzel |
+| Symbols Nerd Font | (fallback within Cascadia/FontAwesome) | Waybar icon fallback |
+| Noto Color Emoji | `google-noto-color-emoji-fonts` | Emoji rendering |
+| Noto Emoji | `google-noto-emoji-fonts` | Emoji fallback |
+| DejaVu Sans | (base system) | System default |
 
 ---
 
@@ -244,7 +243,7 @@ The following fonts are required (installed by `packages.txt`):
 |-----------|--------------|
 | GTK Theme | adw-gtk3-dark |
 | Icon Theme | Papirus-Dark |
-| Cursor Theme | Bibata-Modern-Classic |
+| Cursor Theme | Adwaita |
 | Waybar | Catppuccin Mocha (custom) |
 | Alacritty | Deep navy with sunset accents |
 | Kitty | Glassy Frost Dracula-inspired |
@@ -449,8 +448,7 @@ systemctl --user restart xdg-desktop-portal-gnome
 # Rebuild font cache
 fc-cache -fv
 # Verify fonts are found
-fc-match "FiraCode Nerd Font Mono"
-fc-match "JetBrainsMono Nerd Font"
+fc-match "Cascadia Code NF"
 ```
 
 ---

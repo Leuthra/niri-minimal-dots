@@ -10,19 +10,19 @@ opacity = 0.90
 size = 9
 
 [font.normal]
-family = "FiraCode Nerd Font"
+family = "Cascadia Code NF"
 style = "Regular"
 
 [font.bold]
-family = "FiraCode Nerd Font"
+family = "Cascadia Code NF"
 style = "Bold"
 
 [font.italic]
-family = "FiraCode Nerd Font"
+family = "Cascadia Code NF"
 style = "Italic"
 
 [font.bold_italic]
-family = "FiraCode Nerd Font"
+family = "Cascadia Code NF"
 style = "Bold Italic"
 
 [scrolling]

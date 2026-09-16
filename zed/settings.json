@@ -75,7 +75,7 @@
     "enabled": false,
   },
 
-  "buffer_font_family": "Fira Code",
+  "buffer_font_family": "Cascadia Code NF",
 
   "file_types": {
     "ini": ["config"],

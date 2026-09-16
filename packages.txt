@@ -11,12 +11,17 @@ xdg-desktop-portal-gnome
 alacritty
 kitty
 fish
+starship
+zoxide
+
 
 # ── Fonts & Icons ──────────────────────────────────────────────
 google-noto-color-emoji-fonts
 google-noto-emoji-fonts
 fontawesome-fonts
-fira-code-fonts
+cascadia-code-nf-fonts
+adwaita-cursor-theme
+papirus-icon-theme
 
 # ── Dependencies ───────────────────────────────────────────────
 libnotify
@@ -24,11 +29,12 @@ bluez
 bluez-tools
 pavucontrol
 NetworkManager
+NetworkManager-tui
 network-manager-applet
 nm-connection-editor
 python3
 unzip
-p7zip
+7zip
 unrar
 
 # ── Utilities ──────────────────────────────────────────────────

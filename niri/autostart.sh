@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Cursor
-export XCURSOR_THEME="Bibata-Modern-Classic"
+export XCURSOR_THEME="Adwaita"
 export XCURSOR_SIZE=24
 export XCURSOR_PATH="$HOME/.config/niri:$HOME/.icons:$HOME/.local/share/icons:/usr/share/icons"
 
@@ -37,4 +37,6 @@ wl-paste --watch cliphist store &
 waybar &
 
 # Polkit
-/usr/libexec/polkit-kde-authentication-agent-1 &
+if command -v /usr/libexec/kf6/polkit-kde-authentication-agent-1 >/dev/null 2>&1; then
+    /usr/libexec/kf6/polkit-kde-authentication-agent-1 &
+fi

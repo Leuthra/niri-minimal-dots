@@ -273,7 +273,7 @@ layout {
 
 // Set environment variables
 environment {
-  XCURSOR_THEME "Bibata-Modern-Classic"
+  XCURSOR_THEME "Adwaita"
   XCURSOR_SIZE "24"
 }
 
