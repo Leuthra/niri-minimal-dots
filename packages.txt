@@ -22,6 +22,7 @@ fontawesome-fonts
 cascadia-code-nf-fonts
 adwaita-cursor-theme
 papirus-icon-theme
+adw-gtk3-theme
 
 # ── Dependencies ───────────────────────────────────────────────
 libnotify

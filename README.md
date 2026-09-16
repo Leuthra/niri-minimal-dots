@@ -75,7 +75,6 @@ That's it. The installer handles:
 - Wallpaper installation
 - Portal configuration
 - Script permissions
-- Fish as default shell
 
 ---
 
@@ -91,8 +90,7 @@ That's it. The installer handles:
 5. **Installs wallpapers** from `wallpapers/` to `~/Pictures/wallpapers/`
 6. **Installs MIME associations** (`mimeapps.list` → `~/.config/`)
 7. **Installs portal configs** (`xdg-desktop-portal/*.conf` → `~/.config/xdg-desktop-portal/`)
-8. **Sets Fish as default shell**
-9. **Sets executable permissions** on all scripts
+8. **Sets executable permissions** on all scripts
 
 </details>
 
@@ -258,8 +256,6 @@ The following fonts are required (installed by `packages.txt`):
 .
 ├── alacritty/
 │   └── alacritty.toml           # Terminal config (deep navy theme)
-├── bottom/
-│   └── bottom.toml              # System monitor
 ├── btop/
 │   └── btop.conf                # System monitor (glassy frost theme)
 ├── cava/
@@ -276,8 +272,6 @@ The following fonts are required (installed by `packages.txt`):
 │   └── conf.d/                  # Theme, keybindings, auto-ls
 ├── fuzzel/
 │   └── fuzzel.ini               # App launcher (DejaVu Sans, Catppuccin)
-├── godot/
-│   └── editor_settings-4.5.tres # Godot editor settings
 ├── gtk-3.0/
 │   ├── settings.ini             # GTK3 settings
 │   ├── gtk.css
@@ -290,8 +284,6 @@ The following fonts are required (installed by `packages.txt`):
 │   ├── kitty.conf               # Kitty terminal (Glassy Frost theme)
 │   ├── colors.conf
 │   └── sessions/
-├── lazygit/
-│   └── config.yml               # Git TUI
 ├── local/bin/                   # Custom scripts
 │   ├── powermenu                # Fuzzel power menu
 │   ├── set-wallpaper            # Wallpaper picker
@@ -312,34 +304,24 @@ The following fonts are required (installed by `packages.txt`):
 │   ├── window_rules.kdl         # Per-app window rules
 │   ├── autostart.sh             # Startup script
 │   └── index.theme              # Cursor theme index
-├── nvim/                        # LazyVim config
+├── nvim/                        # Optional Neovim/LazyVim configuration — not installed by the Fedora installer
 │   ├── init.lua
 │   ├── lazy-lock.json
 │   └── lua/
-├── pomoru/
-│   └── config.toml              # Pomodoro timer
-├── qt6ct/
-│   └── qt6ct.conf               # Qt6 theme
 ├── starship/
 │   └── starship.toml            # Shell prompt
 ├── swappy/
 │   └── config                   # Screenshot annotation
 ├── tmux/
 │   └── tmux.conf                # Terminal multiplexer
-├── vlc/
-│   └── vlcrc                    # Media player
 ├── waybar/
 │   ├── config.jsonc             # Bar config (11 modules)
 │   ├── style.css                # Bar styling (Catppuccin Mocha)
 │   ├── modules/                 # Individual module configs
 │   └── scripts/                 # 10 custom scripts
-
 ├── xdg-desktop-portal/
 │   ├── niri-portals.conf        # Niri portal routing
 │   └── portals.conf             # General portal fallback
-├── zed/
-│   ├── settings.json            # Zed editor
-│   └── snippets/                # Code snippets
 ├── wallpapers/
 │   ├── forest_dark_winter.jpg   # Default wallpaper
 │   └── rogue.jpg                # Alternative wallpaper
