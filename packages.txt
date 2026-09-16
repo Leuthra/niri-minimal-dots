@@ -37,6 +37,7 @@ python3
 unzip
 7zip
 unrar
+tar
 
 # ── Utilities ──────────────────────────────────────────────────
 nano
