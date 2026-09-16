@@ -25,6 +25,6 @@ case "$CHOICE" in
         niri msg action quit
         ;;
     *"Lock")
-        niri-lock
+        swaylock -f
         ;;
 esac

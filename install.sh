@@ -1,15 +1,25 @@
 #!/bin/bash
+
 # ╔═══════════════════════════════════════════════════════════════╗
-# ║  Niri Dotfiles - Installation Script                        ║
-# ║  Fresh Arch → Clone → Run → Working Desktop                 ║
+# ║  Niri Dotfiles - Scalable Installation Script (Fedora)        ║
 # ╚═══════════════════════════════════════════════════════════════╝
 
 set -euo pipefail
 
+# Konfigurasi Direktori
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
-CONFIG_DIR="$DOTFILES_DIR"
 
-# ── Colors ─────────────────────────────────────────────────────
+# Daftar Folder yang TIDAK akan di-symlink ke ~/.config
+IGNORE_DIRS=(
+    ".git"
+    "Screenshots"
+    "wallpapers"
+    "local"
+    "nvim"
+    "xdg-desktop-portal"
+)
+
+# ── Helper Functions ───────────────────────────────────────────
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -19,171 +29,100 @@ NC='\033[0m'
 log()   { echo -e "${GREEN}[+]${NC} $1"; }
 warn()  { echo -e "${YELLOW}[!]${NC} $1"; }
 error() { echo -e "${RED}[x]${NC} $1"; exit 1; }
-info()  { echo -e "${BLUE}[i]${NC} $1"; }
 
-# ── Preflight Checks ──────────────────────────────────────────
-if ! command -v pacman &>/dev/null; then
-    error "This script is designed for Arch Linux (pacman not found)"
-fi
-
-if [ "$(id -u)" -eq 0 ]; then
-    error "Do not run this script as root"
-fi
-
-echo -e "${BLUE}"
-echo "  ╔═══════════════════════════════════════╗"
-echo "  ║     Niri Dotfiles Installer           ║"
-echo "  ╚═══════════════════════════════════════╝"
-echo -e "${NC}"
-
-# ── Install Packages ───────────────────────────────────────────
-log "Installing packages from packages.txt..."
-if [ -f "$DOTFILES_DIR/packages.txt" ]; then
-    sudo pacman -S --needed --noconfirm - < "$DOTFILES_DIR/packages.txt"
-else
-    warn "packages.txt not found, skipping package installation"
-fi
-
-# ── Install yay (AUR helper) ──────────────────────────────────
-if ! command -v yay &>/dev/null; then
-    log "Installing yay (AUR helper)..."
-    git clone https://aur.archlinux.org/yay-bin.git /tmp/yay-bin
-    (cd /tmp/yay-bin && makepkg -si --noconfirm)
-    rm -rf /tmp/yay-bin
-fi
-
-# ── Install AUR packages ──────────────────────────────────────
-log "Installing AUR packages..."
-yay -S --needed --noconfirm \
-    niri-git \
-    niri-settings-git \
-    niri-utils \
-    bibata-cursor-theme-bin \
-    brave-bin \
-    vesktop-bin \
-    sddm-sugar-candy-git \
-    pomoru \
-    freesmlauncher-bin \
-    dracula-gtk-theme \
-    neofetch \
-    pipes.sh \
-    tty-clock \
-    femboysay \
-    2>/dev/null || warn "Some AUR packages may have failed"
-
-# ── Create Directories ────────────────────────────────────────
-log "Creating directories..."
-mkdir -p "$HOME/.config"
-mkdir -p "$HOME/.local/bin"
-mkdir -p "$HOME/Pictures/wallpapers"
-mkdir -p "$HOME/Pictures/Screenshots"
-mkdir -p "$HOME/.config/xdg-desktop-portal"
-
-# ── Symlink Configurations ────────────────────────────────────
-log "Linking configurations to ~/.config/..."
-
-link_config() {
-    local src="$1"
-    local dest="$HOME/.config/$2"
-    local name="$2"
-
-    if [ -e "$dest" ] && [ ! -L "$dest" ]; then
-        warn "Backing up existing $name → $name.bak"
-        mv "$dest" "$dest.bak.$(date +%s)"
-    fi
-
-    ln -sfn "$src" "$dest"
-    log "Linked $name"
-}
-
-# Link all config directories
-for dir in "$CONFIG_DIR"/*/; do
-    app_name=$(basename "$dir")
-
-    # Skip directories that aren't configs
-    case "$app_name" in
-        .git|Screenshots|wallpapers|local|nvim|xdg-desktop-portal) continue ;;
-    esac
-
-    link_config "$dir" "$app_name"
-done
-
-# ── Link Local Bin Scripts ────────────────────────────────────
-if [ -d "$CONFIG_DIR/local/bin" ]; then
-    mkdir -p "$HOME/.local/bin"
-    for script in "$CONFIG_DIR/local/bin/"*; do
-        [ -f "$script" ] || continue
-        script_name=$(basename "$script")
-        ln -sfn "$script" "$HOME/.local/bin/$script_name"
-    done
-    log "Linked local/bin scripts"
-fi
-
-# ── Install wallpapers ────────────────────────────────────────
-log "Installing wallpapers..."
-if [ -d "$CONFIG_DIR/wallpapers" ]; then
-    mkdir -p "$HOME/Pictures/wallpapers"
-    for wallpaper in "$CONFIG_DIR/wallpapers"/*; do
-        [ -f "$wallpaper" ] || continue
-        name=$(basename "$wallpaper")
-        [ "$name" = ".gitkeep" ] && continue
-        if [ ! -f "$HOME/Pictures/wallpapers/$name" ]; then
-            cp "$wallpaper" "$HOME/Pictures/wallpapers/$name"
-            log "Installed wallpaper: $name"
+is_ignored() {
+    local target="$1"
+    for ignore in "${IGNORE_DIRS[@]}"; do
+        if [[ "$target" == "$ignore" ]]; then
+            return 0 # True, ignored
         fi
     done
+    return 1 # False, not ignored
+}
+
+# 1. Install paket dari repo resmi Fedora
+log "Membaca paket dari packages.txt..."
+if [ -f "$DOTFILES_DIR/packages.txt" ]; then
+    # Mengambil daftar paket, mengabaikan baris kosong dan baris komentar (#)
+    PACKAGES=$(grep -v '^\s*#' "$DOTFILES_DIR/packages.txt" | grep -v '^\s*$' | tr '\n' ' ')
+    if [ -n "$PACKAGES" ]; then
+        log "Menginstal paket-paket..."
+        sudo dnf install -y $PACKAGES
+    else
+        warn "Daftar paket kosong."
+    fi
+else
+    warn "packages.txt tidak ditemukan, melewati instalasi paket."
 fi
 
-# ── Install MIME associations ─────────────────────────────────
-log "Installing MIME associations..."
-if [ -f "$CONFIG_DIR/mimeapps.list" ]; then
-    cp "$CONFIG_DIR/mimeapps.list" "$HOME/.config/mimeapps.list"
-    log "Installed mimeapps.list"
-fi
+# 2. Buat struktur folder
+log "Membuat struktur direktori..."
+mkdir -p ~/.config ~/.local/bin
+mkdir -p ~/Pictures/wallpapers ~/Pictures/Screenshots
+mkdir -p ~/.config/xdg-desktop-portal
 
-# ── Install portal configuration ─────────────────────────────
-log "Installing portal configuration..."
-if [ -d "$CONFIG_DIR/xdg-desktop-portal" ]; then
-    mkdir -p "$HOME/.config/xdg-desktop-portal"
-    for conf in "$CONFIG_DIR/xdg-desktop-portal"/*.conf; do
-        [ -f "$conf" ] || continue
-        cp "$conf" "$HOME/.config/xdg-desktop-portal/$(basename "$conf")"
-        log "Installed portal config: $(basename "$conf")"
+# 3. Symlink konfigurasi utama (Idempotent)
+log "Melakukan symlink konfigurasi ke ~/.config..."
+for dir_path in "$DOTFILES_DIR"/*/; do
+    [ -d "$dir_path" ] || continue
+    name="$(basename "$dir_path")"
+    
+    if is_ignored "$name"; then
+        continue
+    fi
+    
+    src_dir="$DOTFILES_DIR/$name"
+    dest_dir="$HOME/.config/$name"
+
+    # Jika target adalah symlink ke sumber yang benar, lewati
+    if [ -L "$dest_dir" ] && [ "$(readlink "$dest_dir")" = "$src_dir" ]; then
+        log "Link sudah terpasang: ~/.config/$name"
+        continue
+    fi
+    
+    # Backup HANYA jika target ada dan bukan symlink
+    if [ -e "$dest_dir" ] && [ ! -L "$dest_dir" ]; then
+        warn "Membuat backup: ~/.config/$name -> ~/.config/$name.bak"
+        rm -rf "$dest_dir.bak" 2>/dev/null || true # Hapus backup lama
+        mv "$dest_dir" "$dest_dir.bak"
+    fi
+    
+    ln -sfn "$src_dir" "$dest_dir"
+    log "Linked ~/.config/$name"
+done
+
+# 4. Symlink script lokal (powermenu, dll)
+log "Melakukan symlink skrip ke ~/.local/bin..."
+if [ -d "$DOTFILES_DIR/local/bin" ]; then
+    for script in "$DOTFILES_DIR/local/bin"/*; do
+        [ -f "$script" ] || continue
+        script_name="$(basename "$script")"
+        src_file="$DOTFILES_DIR/local/bin/$script_name"
+        dest_file="$HOME/.local/bin/$script_name"
+
+        if [ -L "$dest_file" ] && [ "$(readlink "$dest_file")" = "$src_file" ]; then
+            continue
+        fi
+
+        chmod +x "$src_file"
+        ln -sfn "$src_file" "$dest_file"
+        log "Linked skrip: $script_name"
     done
 fi
 
-# ── Fix Hardcoded Paths ───────────────────────────────────────
-log "Fixing hardcoded paths..."
-find "$CONFIG_DIR" -type f \( -name "*.css" -o -name "*.kdl" -o -name "*.toml" -o -name "*.ini" -o -name "*.sh" -o -name "*.jsonc" -o -name "*.json" -o -name "bookmarks" -o -name "*.conf" -o -name "layout" -o -name "flameshot.ini" -o -name "*.tres" \) \
+# 5. Salin wallpaper & pengaturan MIME
+log "Menyalin file statis..."
+cp -f "$DOTFILES_DIR"/wallpapers/* ~/Pictures/wallpapers/ 2>/dev/null || true
+cp -f "$DOTFILES_DIR/mimeapps.list" ~/.config/mimeapps.list 2>/dev/null || true
+cp -f "$DOTFILES_DIR"/xdg-desktop-portal/*.conf ~/.config/xdg-desktop-portal/ 2>/dev/null || true
+
+# 6. Pastikan permission script bisa dieksekusi
+log "Memastikan permissions skrip..."
+[ -f "$DOTFILES_DIR/niri/autostart.sh" ] && chmod +x "$DOTFILES_DIR/niri/autostart.sh"
+
+# 7. Perbaiki path hardcoded (__HOME__)
+log "Memperbaiki hardcoded paths (__HOME__)..."
+find "$DOTFILES_DIR" -type f \( -name "*.css" -o -name "*.kdl" -o -name "*.toml" -o -name "*.ini" -o -name "*.sh" -o -name "*.jsonc" -o -name "*.json" -o -name "bookmarks" -o -name "*.conf" -o -name "layout" -o -name "flameshot.ini" -o -name "*.tres" \) \
     -exec sed -i "s|__HOME__|$HOME|g" {} \; 2>/dev/null || true
 
-# ── Set Fish as Default Shell ──────────────────────────────────
-if [ "$SHELL" != "/usr/bin/fish" ]; then
-    log "Setting fish as default shell..."
-    chsh -s /usr/bin/fish
-    info "Shell changed to fish. Will take effect on next login."
-fi
-
-# ── Enable Services ────────────────────────────────────────────
-log "Enabling services..."
-sudo systemctl enable sddm 2>/dev/null || true
-
-# ── Make Scripts Executable ────────────────────────────────────
-log "Setting script permissions..."
-find "$CONFIG_DIR" -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
-find "$CONFIG_DIR/local/bin" -type f -exec chmod +x {} \; 2>/dev/null || true
-
-# ── Done ───────────────────────────────────────────────────────
-echo ""
-echo -e "${GREEN}╔═══════════════════════════════════════════╗"
-echo -e "║     Installation Complete!                ║"
-echo -e "╚═══════════════════════════════════════════╝${NC}"
-echo ""
-echo -e "  ${YELLOW}Next steps:${NC}"
-echo -e "  1. Reboot your system"
-echo -e "  2. Add wallpapers to ~/Pictures/wallpapers/"
-echo -e "  3. Enjoy your new desktop!"
-echo ""
-echo -e "  ${BLUE}Note:${NC} If using SDDM, restart it with:"
-echo -e "  sudo systemctl restart sddm"
-echo ""
+log "Instalasi/Update dotfiles selesai!"
