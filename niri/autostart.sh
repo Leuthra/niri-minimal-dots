@@ -37,6 +37,9 @@ wl-paste --watch cliphist store &
 waybar &
 
 # Polkit
-if command -v /usr/libexec/kf6/polkit-kde-authentication-agent-1 >/dev/null 2>&1; then
-    /usr/libexec/kf6/polkit-kde-authentication-agent-1 &
+POLKIT_AGENT="/usr/libexec/kf6/polkit-kde-authentication-agent-1"
+if [ -x "$POLKIT_AGENT" ]; then
+    "$POLKIT_AGENT" &
+else
+    echo "Warning: polkit-kde authentication agent not found."
 fi

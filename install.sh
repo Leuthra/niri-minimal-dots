@@ -26,6 +26,10 @@ if ! command -v dnf >/dev/null 2>&1; then
     error "This installer requires Fedora or another dnf-based distribution."
 fi
 
+if ! command -v sudo >/dev/null 2>&1; then
+    error "sudo is required to install Fedora packages."
+fi
+
 if [ "$(id -u)" -eq 0 ]; then
     error "Do not run this installer as root. It uses sudo when necessary."
 fi
@@ -78,6 +82,19 @@ if [ -f "$DOTFILES_DIR/packages.txt" ]; then
     fi
 else
     warn "packages.txt tidak ditemukan, melewati instalasi paket."
+fi
+
+# Install Starship separately because it may not exist in Fedora repositories
+if ! command -v starship >/dev/null 2>&1; then
+    log "Installing Starship..."
+    mkdir -p "$HOME/.local/bin"
+
+    if command -v curl >/dev/null 2>&1; then
+        curl -sS https://starship.rs/install.sh | \
+            sh -s -- -y -b "$HOME/.local/bin"
+    else
+        error "curl is required to install Starship"
+    fi
 fi
 
 # 2. Buat struktur folder
@@ -137,9 +154,18 @@ fi
 
 # 5. Salin wallpaper & pengaturan MIME
 log "Menyalin file statis..."
-cp -f "$DOTFILES_DIR"/wallpapers/* ~/Pictures/wallpapers/ 2>/dev/null || true
-cp -f "$DOTFILES_DIR/mimeapps.list" ~/.config/mimeapps.list 2>/dev/null || true
-cp -f "$DOTFILES_DIR"/xdg-desktop-portal/*.conf ~/.config/xdg-desktop-portal/ 2>/dev/null || true
+if [ -d "$DOTFILES_DIR/wallpapers" ]; then
+    cp -f "$DOTFILES_DIR"/wallpapers/* "$HOME/Pictures/wallpapers/"
+fi
+
+if [ -f "$DOTFILES_DIR/mimeapps.list" ]; then
+    cp -f "$DOTFILES_DIR/mimeapps.list" "$HOME/.config/mimeapps.list"
+fi
+
+if compgen -G "$DOTFILES_DIR/xdg-desktop-portal/*.conf" > /dev/null; then
+    cp -f "$DOTFILES_DIR"/xdg-desktop-portal/*.conf \
+        "$HOME/.config/xdg-desktop-portal/"
+fi
 
 # 6. Pastikan permission script bisa dieksekusi
 log "Memastikan permissions skrip..."

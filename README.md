@@ -326,7 +326,7 @@ The following fonts are required (installed by `packages.txt`):
 │   ├── forest_dark_winter.jpg   # Default wallpaper
 │   └── rogue.jpg                # Alternative wallpaper
 ├── mimeapps.list                # MIME associations
-├── packages.txt                 # Package list (~150 packages)
+├── packages.txt                 # Fedora package list for the core Niri desktop
 ├── install.sh                   # Automated installer
 ├── .gitignore
 ├── LICENSE

@@ -285,7 +285,7 @@ environment {
 // This line starts waybar, a commonly used bar for Wayland compositors.
 //spawn-at-startup "waybar"
 //spawn-at-startup "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
-spawn-at-startup "~/.config/niri/autostart.sh"
+spawn-sh-at-startup "$HOME/.config/niri/autostart.sh"
 spawn-at-startup "nm-applet"
 spawn-at-startup "gnome-keyring-daemon --start --components=pkcs11,secrets,ssh"
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
