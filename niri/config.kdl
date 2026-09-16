@@ -332,5 +332,5 @@ animations {
   slowdown 1.4
 }
 include "window_rules.kdl" // Made by me
-include "basicsettings.kdl" // Added by niri-settings
+
 include "keybinds.kdl" // Added by niri-settings

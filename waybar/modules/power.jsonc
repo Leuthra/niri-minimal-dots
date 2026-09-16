@@ -3,7 +3,7 @@
   "custom/power": {
     "format": "󰐦",
     "tooltip": "Power Menu",
-    "on-click": "~/.config/waybar/scripts/powermenu.sh",
+    "on-click": "$HOME/.config/waybar/scripts/powermenu.sh",
     "on-click-right": "shutdown",
   },
 }

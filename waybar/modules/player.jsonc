@@ -1,7 +1,7 @@
 {
   // ───────── Media Player ─────────
   "custom/player": {
-    "exec": "~/.config/waybar/scripts/mediaplayer.sh",
+    "exec": "$HOME/.config/waybar/scripts/mediaplayer.sh",
     "return-type": "json",
     "interval": 2,
     "max-length": 50,

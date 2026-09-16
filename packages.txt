@@ -12,11 +12,21 @@ alacritty
 kitty
 fish
 
+# ── Dependencies ───────────────────────────────────────────────
+libnotify
+bluez
+bluez-tools
+pavucontrol
+NetworkManager
+network-manager-applet
+nm-connection-editor
+python3
+
 # ── Utilities ──────────────────────────────────────────────────
 wl-clipboard
 cliphist
 brightnessctl
-network-manager-applet
+
 grim
 slurp
 swappy

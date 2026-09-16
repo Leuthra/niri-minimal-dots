@@ -7,7 +7,7 @@ if status is-interactive
 
     # Defaults
     set -gx TERMINAL alacritty
-    set -gx EDITOR nvim
+    set -gx EDITOR nano
     set -gx VISUAL $EDITOR
     set -gx PAGER less
 
@@ -73,7 +73,7 @@ if status is-interactive
     function serve --description "Serve current dir over HTTP"
         set -l port 8000
         test (count $argv) -ge 1; and set port $argv[1]
-        python -m http.server $port
+        python3 -m http.server $port
     end
 
     function memtop --description "Top memory consumers"

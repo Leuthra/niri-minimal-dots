@@ -17,7 +17,7 @@ dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 (
     for i in $(seq 1 50); do
         if busctl --user status org.gnome.Mutter.ScreenCast >/dev/null 2>&1; then
-            pkill -f xdg-desktop-portal-gnome || true
+            systemctl --user restart xdg-desktop-portal-gnome.service 2>/dev/null || true
             break
         fi
         sleep 0.2

@@ -5,12 +5,12 @@
 <h1 align="center">Niri Dotfiles</h1>
 
 <p align="center">
-  A complete, reproducible <a href="https://github.com/YaLTeR/niri">Niri</a> Wayland desktop environment for Arch Linux.
+  A complete, reproducible <a href="https://github.com/YaLTeR/niri">Niri</a> Wayland desktop environment for Fedora Linux.
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Niri-Wayland_compositor-5E9FD6?style=flat-square&logo=gnome-terminal&logoColor=white" alt="Niri">
-  <img src="https://img.shields.io/badge/Arch_Linux-1793D1?style=flat-square&logo=archlinux&logoColor=white" alt="Arch Linux">
+  <img src="https://img.shields.io/badge/Fedora-294172?style=flat-square&logo=fedora&logoColor=white" alt="Fedora Linux">
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="MIT License">
 </p>
 
@@ -38,7 +38,7 @@
 
 ## What's Included
 
-This repository reproduces a complete Niri desktop environment from a fresh Arch Linux install. It includes:
+This repository reproduces a complete Niri desktop environment from a fresh Fedora Linux install. It includes:
 
 - **Niri** — scrollable tiling compositor with blur, animations, and rounded corners
 - **Waybar** — modular status bar with player, clipboard, notifications, CPU, memory, power
@@ -57,8 +57,8 @@ This repository reproduces a complete Niri desktop environment from a fresh Arch
 
 ```bash
 # Clone the repository
-git clone https://github.com/youngcoder45/Niri-minimal-dots.git
-cd Niri-minimal-dots
+git clone https://github.com/Leuthra/niri-minimal-dots.git
+cd niri-minimal-dots
 
 # Run the installer (installs packages, symlinks configs, sets up everything)
 chmod +x install.sh
@@ -69,7 +69,7 @@ sudo reboot
 ```
 
 That's it. The installer handles:
-- Package installation (pacman + AUR via yay)
+- Package installation (dnf)
 - Config symlinking with backups
 - MIME associations
 - Wallpaper installation
@@ -85,19 +85,15 @@ That's it. The installer handles:
 <details>
 <summary><strong>Click to expand full install.sh behavior</strong></summary>
 
-1. **Installs packages** from `packages.txt` via `pacman -S --needed`
-2. **Installs yay** (AUR helper) if not present
-3. **Installs AUR packages** via yay (niri-git, brave-bin, vesktop-bin, etc.)
-4. **Creates directories** (`~/.config`, `~/.local/bin`, `~/Pictures/wallpapers`)
-5. **Symlinks all config directories** from the repo to `~/.config/` (backs up existing)
-6. **Links local/bin scripts** to `~/.local/bin/`
-7. **Installs wallpapers** from `wallpapers/` to `~/Pictures/wallpapers/`
-8. **Installs MIME associations** (`mimeapps.list` → `~/.config/`)
-9. **Installs portal configs** (`xdg-desktop-portal/*.conf` → `~/.config/xdg-desktop-portal/`)
-10. **Fixes hardcoded paths** — replaces `__HOME__` with actual `$HOME` in all config files
-11. **Sets Fish as default shell**
-12. **Enables SDDM** display manager
-13. **Sets executable permissions** on all scripts
+1. **Installs packages** from `packages.txt` via `dnf install` (uses `mapfile` to safely parse the array)
+2. **Creates directories** (`~/.config`, `~/.local/bin`, `~/Pictures/wallpapers`)
+3. **Symlinks all config directories** from the repo to `~/.config/` (backs up existing)
+4. **Links local/bin scripts** to `~/.local/bin/`
+5. **Installs wallpapers** from `wallpapers/` to `~/Pictures/wallpapers/`
+6. **Installs MIME associations** (`mimeapps.list` → `~/.config/`)
+7. **Installs portal configs** (`xdg-desktop-portal/*.conf` → `~/.config/xdg-desktop-portal/`)
+8. **Sets Fish as default shell**
+9. **Sets executable permissions** on all scripts
 
 </details>
 
@@ -113,13 +109,9 @@ That's it. The installer handles:
 | `Alt + Return` | Open terminal (Kitty) |
 | `Mod + Space` | Application launcher (Fuzzel) |
 | `Mod + B` | Open browser (Firefox) |
-| `Mod + C` | Open code editor (VS Code) |
-| `Mod + V` | Open Vesktop (Discord) |
 | `Mod + E` | Open file manager (Nautilus) |
-| `Mod + Z` | Open Zed editor |
-| `Mod + T` | Power menu (Wlogout) |
-| `Mod + P` | Power menu (Fuzzel-based) |
-| `Print` | Screenshot (Flameshot GUI) |
+| `Mod + T` | Power menu (Fuzzel-based) |
+| `Print` | Screenshot (Grim + Slurp + Swappy) |
 
 ### Window Management
 
@@ -168,7 +160,7 @@ That's it. The installer handles:
 
 | Keybinding | Action |
 |------------|--------|
-| `Print` | Screenshot (Flameshot GUI) |
+| `Print` | Screenshot (Grim + Slurp + Swappy) |
 | `Ctrl + Print` | Screenshot (current output) |
 | `Alt + Print` | Screenshot (current window) |
 
@@ -180,7 +172,7 @@ That's it. The installer handles:
 
 | Script | Description | Dependencies |
 |--------|-------------|--------------|
-| `powermenu` | Fuzzel-based power menu (Shutdown/Reboot/Suspend/Logout/Lock) | fuzzel, systemctl, niri-lock |
+| `powermenu` | Fuzzel-based power menu (Shutdown/Reboot/Suspend/Logout/Lock) | fuzzel, systemctl, swaylock |
 | `set-wallpaper` | Interactive wallpaper picker using Fuzzel | fuzzel, swaybg |
 | `clipboard-history` | Browse and select from clipboard history | cliphist, fuzzel, wl-copy |
 | `notification-history` | Browse notification history | fuzzel, makoctl |
@@ -209,21 +201,15 @@ Configured in `mimeapps.list`:
 
 | Type | Default App |
 |------|------------|
-| PDF | Zathura |
-| JPEG/PNG/WEBP/GIF | Loupe |
+| PDF | Firefox |
+| JPEG/PNG/WEBP/GIF | Nautilus |
 | SVG | Firefox |
-| Markdown | Obsidian |
-| Plain text | Zed |
-| CSV / XLS / XLSX | Gnumeric |
-| YAML | Zed |
+| Plain text | Kitty |
+| Directories | Nautilus |
 | HTML | Firefox |
 | Video (mp4) | mpv |
 | Audio (mp3) | mpv |
-| Archives (zip) | FreesmLauncher |
-| Archives (tar) | FileRoller |
-| Directories | Nautilus |
 | HTTP/HTTPS | Firefox |
-| Discord links | Vesktop |
 
 ---
 
@@ -354,9 +340,7 @@ The following fonts are required (installed by `packages.txt`):
 │   ├── style.css                # Bar styling (Catppuccin Mocha)
 │   ├── modules/                 # Individual module configs
 │   └── scripts/                 # 10 custom scripts
-├── wlogout/
-│   ├── layout                   # Power menu layout
-│   └── style.css                # Power menu styling
+
 ├── xdg-desktop-portal/
 │   ├── niri-portals.conf        # Niri portal routing
 │   └── portals.conf             # General portal fallback
@@ -399,7 +383,6 @@ swaybg -i "$HOME/Pictures/wallpapers/your-wallpaper.jpg" -m fill &
 | `mako/config` | Notification colors |
 | `alacritty/alacritty.toml` | Alacritty colors |
 | `kitty/kitty.conf` | Kitty colors |
-| `niri-lock/style.css` | Lock screen colors |
 | `fuzzel/fuzzel.ini` | Launcher colors |
 
 ### Add Waybar Modules
@@ -442,8 +425,8 @@ swaybg -i ~/Pictures/wallpapers/your-wallpaper.jpg -m fill &
 
 ### Lock screen not working
 ```bash
-# Test niri-lock
-niri-lock
+# Test swaylock
+swaylock -f
 ```
 
 ### Screen sharing not working
@@ -483,24 +466,17 @@ fc-match "JetBrainsMono Nerd Font"
 | Shell | [Fish](https://fishshell.com/) |
 | Prompt | [Starship](https://starship.rs/) |
 | Notifications | [Mako](https://github.com/emersion/mako) |
-| Lock Screen | [gtklock](https://github.com/jovanlanik/gtklock) (via niri-lock) |
-| Power Menu | [Wlogout](https://github.com/nicoplv/wlogout) + Fuzzel custom |
+| Lock Screen | [Swaylock](https://github.com/swaywm/swaylock) |
+| Power Menu | Fuzzel custom |
 | Clipboard | [Cliphist](https://github.com/sentriz/cliphist) + [wl-clipboard](https://github.com/bugaevc/wl-clipboard) |
-| Screenshot | [Flameshot](https://flameshot.org/) |
+| Screenshot | [Grim](https://sr.ht/~emersion/grim/) + [Slurp](https://wayland.emersion.fr/slurp/) + [Swappy](https://github.com/jtheoof/swappy) |
 | Wallpaper | [Swaybg](https://github.com/swaywm/swaybg) |
-| File Manager | [Nautilus](https://apps.gnome.org/Nautilus/) + [nnn](https://github.com/jarun/nnn) |
-| Code Editor | [Neovim](https://neovim.io/) (LazyVim) + [VS Code](https://code.visualstudio.com/) + [Zed](https://zed.dev/) |
-| Browser | [Brave](https://brave.com/) + [Firefox](https://www.mozilla.org/) |
-| Media Player | [mpv](https://mpv.io/) + [VLC](https://www.videolan.org/) |
-| System Monitor | [Bottom](https://github.com/ClementTsang/bottom) + [btop](https://github.com/aristocratos/btop) |
+| File Manager | [Nautilus](https://apps.gnome.org/Nautilus/) |
+| Browser | [Firefox](https://www.mozilla.org/) |
+| Media Player | [mpv](https://mpv.io/) |
+| System Monitor | [btop](https://github.com/aristocratos/btop) |
 | Audio Visualizer | [Cava](https://github.com/kornerc/cava) |
-| Git UI | [Lazygit](https://github.com/jesseduffield/lazygit) |
 | System Info | [Fastfetch](https://github.com/fastfetch-cli/fastfetch) |
-| Pomodoro | [Pomoru](https://github.com/animeai/pomoru) |
-| Discord | [Vesktop](https://github.com/Vencord/Vesktop) |
-| PDF Viewer | [Zathura](https://github.com/pwmt/zathura) |
-| Image Viewer | [Loupe](https://gitlab.gnome.org/Incubate/Loupe) |
-| Display Manager | [SDDM](https://github.com/sddm/sddm) (sugar-candy theme) |
 
 ---
 

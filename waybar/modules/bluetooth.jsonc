@@ -9,7 +9,7 @@
     "tooltip-format": "{controller_alias}\t{controller_address}",
     "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
     "tooltip-format-enumerate-connected": "󰂯 {device_alias}\t{device_battery_percentage}%",
-    "on-click": "~/.config/waybar/scripts/bluetooth-control.sh",
+    "on-click": "$HOME/.config/waybar/scripts/bluetooth-control.sh",
     "on-click-right": "rfkill toggle bluetooth"
   }
 }

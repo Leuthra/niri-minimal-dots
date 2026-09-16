@@ -53,7 +53,10 @@ if [ -f "$DOTFILES_DIR/packages.txt" ]; then
         log "Tidak ada paket yang ditemukan di packages.txt."
     else
         log "Menginstal ${#PKG_ARRAY[@]} paket..."
-        sudo dnf install -y "${PKG_ARRAY[@]}" || true
+        if ! sudo dnf install -y "${PKG_ARRAY[@]}"; then
+            warn "Instalasi paket gagal. Periksa nama paket Fedora di packages.txt."
+            exit 1
+        fi
     fi
 else
     warn "packages.txt tidak ditemukan, melewati instalasi paket."
@@ -123,6 +126,8 @@ cp -f "$DOTFILES_DIR"/xdg-desktop-portal/*.conf ~/.config/xdg-desktop-portal/ 2>
 # 6. Pastikan permission script bisa dieksekusi
 log "Memastikan permissions skrip..."
 [ -f "$DOTFILES_DIR/niri/autostart.sh" ] && chmod +x "$DOTFILES_DIR/niri/autostart.sh"
+[ -d "$DOTFILES_DIR/waybar/scripts" ] && chmod +x "$DOTFILES_DIR"/waybar/scripts/*.sh 2>/dev/null || true
+[ -d "$DOTFILES_DIR/local/bin" ] && chmod +x "$DOTFILES_DIR"/local/bin/* 2>/dev/null || true
 
 
 
