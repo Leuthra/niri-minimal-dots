@@ -23,6 +23,7 @@ swappy
 nautilus
 git
 btop
+firefox
 fastfetch
 gnome-keyring
 polkit-gnome

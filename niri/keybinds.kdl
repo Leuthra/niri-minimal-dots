@@ -16,7 +16,7 @@ binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 
     // Power menu (wlogout)
-    Mod+T { spawn "~/.local/bin/powermenu"; }
+    Mod+T { spawn-sh "$HOME/.local/bin/powermenu"; }
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+Return hotkey-overlay-title="Open a Terminal: alacritty" { spawn "alacritty"; }
@@ -225,7 +225,7 @@ binds {
     Mod+Ctrl+R { reset-window-height; }
     Mod+F { maximize-column; }
     Mod+Shift+F { fullscreen-window; }
-    Mod+P { spawn "__HOME__/.local/bin/powermenu"; }
+    Mod+P { spawn-sh "$HOME/.local/bin/powermenu"; }
     // Expand the focused column to space not taken up by other fully visible columns.
     // Makes the column "fill the rest of the space".
     Mod+Ctrl+F { expand-column-to-available-width; }

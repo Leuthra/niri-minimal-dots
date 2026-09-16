@@ -44,12 +44,16 @@ is_ignored() {
 log "Membaca paket dari packages.txt..."
 if [ -f "$DOTFILES_DIR/packages.txt" ]; then
     # Mengambil daftar paket, mengabaikan baris kosong dan baris komentar (#)
-    PACKAGES=$(grep -v '^\s*#' "$DOTFILES_DIR/packages.txt" | grep -v '^\s*$' | tr '\n' ' ')
-    if [ -n "$PACKAGES" ]; then
-        log "Menginstal paket-paket..."
-        sudo dnf install -y $PACKAGES
+    # Install paket dengan list array yang bersih
+    mapfile -t PKG_ARRAY < <(
+        grep -vE '^[[:space:]]*#|^[[:space:]]*$' "$DOTFILES_DIR/packages.txt"
+    )
+    
+    if [ ${#PKG_ARRAY[@]} -eq 0 ]; then
+        log "Tidak ada paket yang ditemukan di packages.txt."
     else
-        warn "Daftar paket kosong."
+        log "Menginstal ${#PKG_ARRAY[@]} paket..."
+        sudo dnf install -y "${PKG_ARRAY[@]}" || true
     fi
 else
     warn "packages.txt tidak ditemukan, melewati instalasi paket."
@@ -120,9 +124,6 @@ cp -f "$DOTFILES_DIR"/xdg-desktop-portal/*.conf ~/.config/xdg-desktop-portal/ 2>
 log "Memastikan permissions skrip..."
 [ -f "$DOTFILES_DIR/niri/autostart.sh" ] && chmod +x "$DOTFILES_DIR/niri/autostart.sh"
 
-# 7. Perbaiki path hardcoded (__HOME__)
-log "Memperbaiki hardcoded paths (__HOME__)..."
-find "$DOTFILES_DIR" -type f \( -name "*.css" -o -name "*.kdl" -o -name "*.toml" -o -name "*.ini" -o -name "*.sh" -o -name "*.jsonc" -o -name "*.json" -o -name "bookmarks" -o -name "*.conf" -o -name "layout" -o -name "flameshot.ini" -o -name "*.tres" \) \
-    -exec sed -i "s|__HOME__|$HOME|g" {} \; 2>/dev/null || true
+
 
 log "Instalasi/Update dotfiles selesai!"

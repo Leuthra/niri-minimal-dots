@@ -14,7 +14,15 @@ export GTK_USE_PORTAL=1
 # Export to DBus (REQUIRED)
 dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP &
 
-sh -c 'while ! busctl --user status org.gnome.Mutter.ScreenCast >/dev/null 2>&1; do sleep 0.2; done; pkill -f xdg-desktop-portal-gnome' &
+(
+    for i in $(seq 1 50); do
+        if busctl --user status org.gnome.Mutter.ScreenCast >/dev/null 2>&1; then
+            pkill -f xdg-desktop-portal-gnome || true
+            break
+        fi
+        sleep 0.2
+    done
+) &
 
 # Wallpaper
 swaybg -i "$HOME/Pictures/wallpapers/forest_dark_winter.jpg" -m fill &
