@@ -49,7 +49,7 @@ This repository reproduces a complete Niri desktop environment from a fresh Fedo
 - **Custom scripts** — power menu, wallpaper picker, clipboard history, notification history
 - **MIME associations** — PDF, images, code, archives, media all configured
 - **Portal configuration** — screen sharing and screenshots working out of the box
-- **GTK/Qt theming** — adw-gtk3-dark, Papirus-Dark icons, Bibata cursor
+- **GTK/Qt theming** — adw-gtk3-dark, Papirus-Dark icons, Adwaita cursor
 
 ---
 
@@ -274,8 +274,6 @@ The following fonts are required (installed by `packages.txt`):
 ├── fish/
 │   ├── config.fish              # Fish shell config
 │   └── conf.d/                  # Theme, keybindings, auto-ls
-├── flameshot/
-│   └── flameshot.ini            # Screenshot tool
 ├── fuzzel/
 │   └── fuzzel.ini               # App launcher (DejaVu Sans, Catppuccin)
 ├── godot/
@@ -314,10 +312,6 @@ The following fonts are required (installed by `packages.txt`):
 │   ├── window_rules.kdl         # Per-app window rules
 │   ├── autostart.sh             # Startup script
 │   └── index.theme              # Cursor theme index
-├── niri-lock/
-│   ├── config.ini               # Lock screen config
-│   ├── lock.sh                  # Lock script
-│   └── style.css                # Lock screen styling
 ├── nvim/                        # LazyVim config
 │   ├── init.lua
 │   ├── lazy-lock.json
@@ -399,7 +393,7 @@ Edit `font_family` in `alacritty/alacritty.toml` or `font_family` in `kitty/kitt
 ### Waybar icons not showing
 ```bash
 # Install the missing symbols font
-sudo pacman -S ttf-nerd-fonts-symbols
+sudo dnf install cascadia-code-nf-fonts -y
 fc-cache -fv
 killall waybar && waybar &
 ```

@@ -38,6 +38,8 @@ unzip
 unrar
 
 # ── Utilities ──────────────────────────────────────────────────
+nano
+less
 wl-clipboard
 cliphist
 brightnessctl

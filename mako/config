@@ -22,7 +22,7 @@ border-radius=8
 # Icons
 icons=1
 max-icon-size=44
-icon-path=/usr/share/icons/Papirus-Dark
+icon-path=/usr/share/icons/Papirus-Dark:/usr/share/icons/Adwaita
 
 # Text
 font=Cascadia Code NF 9

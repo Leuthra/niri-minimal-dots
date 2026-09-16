@@ -15,7 +15,7 @@ binds {
     // shows a list of important hotkeys.
     Mod+Shift+Slash { show-hotkey-overlay; }
 
-    // Power menu (wlogout)
+    // Power menu (Fuzzel custom)
     Mod+T { spawn-sh "$HOME/.local/bin/powermenu"; }
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.

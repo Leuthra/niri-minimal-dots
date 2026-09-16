@@ -9,16 +9,6 @@ set -euo pipefail
 # Konfigurasi Direktori
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Daftar Folder yang TIDAK akan di-symlink ke ~/.config
-IGNORE_DIRS=(
-    ".git"
-    "Screenshots"
-    "wallpapers"
-    "local"
-    "nvim"
-    "xdg-desktop-portal"
-)
-
 # ── Helper Functions ───────────────────────────────────────────
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -29,6 +19,28 @@ NC='\033[0m'
 log()   { echo -e "${GREEN}[+]${NC} $1"; }
 warn()  { echo -e "${YELLOW}[!]${NC} $1"; }
 error() { echo -e "${RED}[x]${NC} $1"; exit 1; }
+
+# ── Preflight Checks ───────────────────────────────────────────
+
+if ! command -v dnf >/dev/null 2>&1; then
+    error "This installer requires Fedora or another dnf-based distribution."
+fi
+
+if [ "$(id -u)" -eq 0 ]; then
+    error "Do not run this installer as root. It uses sudo when necessary."
+fi
+
+# Daftar Folder yang TIDAK akan di-symlink ke ~/.config
+IGNORE_DIRS=(
+    ".git"
+    "Screenshots"
+    "wallpapers"
+    "local"
+    "nvim"
+    "xdg-desktop-portal"
+)
+
+
 
 is_ignored() {
     local target="$1"
@@ -136,5 +148,10 @@ log "Memastikan permissions skrip..."
 [ -d "$DOTFILES_DIR/local/bin" ] && chmod +x "$DOTFILES_DIR"/local/bin/* 2>/dev/null || true
 
 
+
+# 7. Restart Portal Services
+log "Restarting portal services..."
+systemctl --user restart xdg-desktop-portal.service 2>/dev/null || true
+systemctl --user restart xdg-desktop-portal-gnome.service 2>/dev/null || true
 
 log "Instalasi/Update dotfiles selesai!"
