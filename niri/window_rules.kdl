@@ -46,6 +46,20 @@ window-rule {
 }
 
 window-rule {
+    match app-id="vesktop"
+    match app-id="dev.vencord.Vesktop"
+    opacity 0.95
+    default-column-width { proportion 0.66667; }
+}
+
+window-rule {
+    match app-id="com.usebruno.Bruno"
+    match app-id="bruno"
+    opacity 0.95
+    default-column-width { proportion 0.66667; }
+}
+
+window-rule {
     match app-id="Tk"
     open-floating true
     background-effect {

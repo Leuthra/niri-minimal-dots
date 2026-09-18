@@ -35,6 +35,9 @@ default-timeout=5000
 ignore-timeout=0
 max-visible=5
 
+# Sound effect on notification
+on-notify=exec pw-play /usr/share/sounds/freedesktop/stereo/message.oga 2>/dev/null || canberra-gtk-play -i message 2>/dev/null || true
+
 # Progress bar (für media notifications)
 [hidden]
 format=(+%i more)

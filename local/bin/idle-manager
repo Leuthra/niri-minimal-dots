@@ -1,0 +1,47 @@
+#!/bin/bash
+# Configurable idle & sleep manager using swayidle for Niri
+
+CONFIG_FILE="$HOME/.config/niri/idle.conf"
+
+# Defaults if not configured
+LOCK_TIMEOUT=300
+SCREEN_OFF_TIMEOUT=600
+SUSPEND_TIMEOUT=1200
+
+if [ -f "$CONFIG_FILE" ]; then
+    # shellcheck source=/dev/null
+    source "$CONFIG_FILE"
+fi
+
+case "${1:-}" in
+    --toggle)
+        if pgrep -x swayidle >/dev/null; then
+            pkill -x swayidle
+            notify-send -i "preferences-desktop-screensaver" "Sleep Manager" "Sleep/Idle disabled (Caffeine Mode)"
+        else
+            "$0" &
+            notify-send -i "preferences-desktop-screensaver" "Sleep Manager" "Sleep/Idle re-enabled"
+        fi
+        exit 0
+        ;;
+    --status)
+        if pgrep -x swayidle >/dev/null; then
+            echo "enabled"
+        else
+            echo "disabled"
+        fi
+        exit 0
+        ;;
+esac
+
+# Kill existing instance
+pkill -x swayidle 2>/dev/null || true
+
+# Run swayidle
+exec swayidle -w \
+    timeout "$LOCK_TIMEOUT" 'swaylock -f' \
+    timeout "$SCREEN_OFF_TIMEOUT" 'niri msg action power-off-monitors' \
+        resume 'niri msg action power-on-monitors' \
+    timeout "$SUSPEND_TIMEOUT" 'systemctl suspend' \
+    before-sleep 'swaylock -f' \
+    after-resume 'niri msg action power-on-monitors'

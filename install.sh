@@ -42,6 +42,10 @@ IGNORE_DIRS=(
     "local"
     "nvim"
     "xdg-desktop-portal"
+    "greetd"
+    "systemd"
+    "udev"
+    "security"
 )
 
 
@@ -79,9 +83,43 @@ if [ -f "$DOTFILES_DIR/packages.txt" ]; then
             log "Mengaktifkan service Bluetooth..."
             sudo systemctl enable --now bluetooth.service
         fi
+
+        # Enable rootless podman socket if installed
+        if command -v podman >/dev/null 2>&1; then
+            log "Mengaktifkan rootless Podman socket..."
+            systemctl --user enable --now podman.socket 2>/dev/null || true
+        fi
+
+        # Enable Thunderbolt daemon if installed
+        if command -v boltctl >/dev/null 2>&1; then
+            log "Mengaktifkan service Thunderbolt (bolt)..."
+            sudo systemctl enable --now bolt.service 2>/dev/null || true
+        fi
+
+        # Enable printer support (CUPS & Avahi)
+        if command -v cupsd >/dev/null 2>&1; then
+            log "Mengaktifkan service printer (CUPS & Avahi)..."
+            sudo systemctl enable --now cups.service 2>/dev/null || true
+            sudo systemctl enable --now avahi-daemon.service 2>/dev/null || true
+        fi
     fi
 else
     warn "packages.txt tidak ditemukan, melewati instalasi paket."
+fi
+
+# Flatpak Flathub, OnlyOffice & Vesktop
+if command -v flatpak >/dev/null 2>&1; then
+    log "Mengonfigurasi Flathub..."
+    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null || true
+
+    log "Memeriksa instalasi OnlyOffice Desktop Editors (Flatpak)..."
+    flatpak install -y --noninteractive flathub org.onlyoffice.desktopeditors 2>/dev/null || warn "Gagal menginstal OnlyOffice via Flatpak."
+
+    log "Memeriksa instalasi Vesktop Discord (Flatpak)..."
+    flatpak install -y --noninteractive flathub dev.vencord.Vesktop 2>/dev/null || warn "Gagal menginstal Vesktop via Flatpak."
+
+    log "Memeriksa instalasi Bruno API Client (Flatpak)..."
+    flatpak install -y --noninteractive flathub com.usebruno.Bruno 2>/dev/null || warn "Gagal menginstal Bruno via Flatpak."
 fi
 
 # Install Starship separately because it may not exist in Fedora repositories
@@ -94,6 +132,14 @@ if ! command -v starship >/dev/null 2>&1; then
             sh -s -- -y -b "$HOME/.local/bin"
     else
         error "curl is required to install Starship"
+    fi
+fi
+
+# Install Zed editor if not installed
+if ! command -v zed >/dev/null 2>&1 && [ ! -f "$HOME/.local/bin/zed" ]; then
+    log "Menginstal Zed editor..."
+    if command -v curl >/dev/null 2>&1; then
+        curl -f https://zed.dev/install.sh | sh 2>/dev/null || warn "Gagal menginstal Zed editor otomatis."
     fi
 fi
 
@@ -152,6 +198,16 @@ if [ -d "$DOTFILES_DIR/local/bin" ]; then
     done
 fi
 
+if [ -d "$DOTFILES_DIR/local/share/applications" ]; then
+    mkdir -p "$HOME/.local/share/applications"
+    for app in "$DOTFILES_DIR/local/share/applications"/*.desktop; do
+        [ -f "$app" ] || continue
+        app_name="$(basename "$app")"
+        ln -sfn "$app" "$HOME/.local/share/applications/$app_name"
+        log "Linked desktop entry: $app_name"
+    done
+fi
+
 # 5. Salin wallpaper & pengaturan MIME
 log "Menyalin file statis..."
 if [ -d "$DOTFILES_DIR/wallpapers" ]; then
@@ -175,7 +231,81 @@ log "Memastikan permissions skrip..."
 
 
 
-# 7. Restart Portal Services
+# 7. Setup Login Screen (ReGreet) & Boot Splash (Plymouth)
+log "Mengonfigurasi ReGreet & Plymouth..."
+
+# Enable COPR untuk ReGreet jika belum aktif
+if ! dnf repolist 2>/dev/null | grep -qi "regreet"; then
+    log "Mengaktifkan COPR mystical-devil/ReGreet..."
+    sudo dnf copr enable -y mystical-devil/ReGreet || warn "Gagal mengaktifkan COPR ReGreet."
+fi
+
+# Install komponen greetd, cage, regreet, plymouth
+log "Menginstal paket login & boot..."
+sudo dnf install -y greetd greetd-selinux cage regreet plymouth plymouth-system-theme || warn "Gagal menginstal beberapa paket login/boot."
+
+# Setup wallpaper sistem untuk greeter
+sudo mkdir -p /usr/share/backgrounds
+if [ -f "$DOTFILES_DIR/wallpapers/forest_dark_winter.jpg" ]; then
+    sudo cp -f "$DOTFILES_DIR/wallpapers/forest_dark_winter.jpg" /usr/share/backgrounds/login-wallpaper.jpg
+fi
+
+# Pasang konfigurasi greetd
+if [ -d "$DOTFILES_DIR/greetd" ]; then
+    sudo mkdir -p /etc/greetd
+    sudo cp -f "$DOTFILES_DIR/greetd/config.toml" /etc/greetd/config.toml
+    sudo cp -f "$DOTFILES_DIR/greetd/regreet.toml" /etc/greetd/regreet.toml
+    sudo chmod -R 755 /etc/greetd
+fi
+
+# Set tema boot Plymouth ke spinner
+if command -v plymouth-set-default-theme >/dev/null 2>&1; then
+    log "Mengatur tema boot Plymouth ke spinner..."
+    sudo plymouth-set-default-theme spinner -R 2>/dev/null || true
+fi
+
+# Aktifkan greetd service (gantikan GDM/SDDM)
+if command -v greetd >/dev/null 2>&1; then
+    log "Mengaktifkan greetd service..."
+    sudo systemctl disable gdm 2>/dev/null || true
+    sudo systemctl disable sddm 2>/dev/null || true
+    sudo systemctl enable greetd.service 2>/dev/null || true
+fi
+
+# 8. Setup Battery Charge Threshold (80%) jika didukung hardware
+if [ -d "/sys/class/power_supply" ] && ls /sys/class/power_supply/BAT* >/dev/null 2>&1; then
+    log "Mengonfigurasi batas charge baterai 80%..."
+    if [ -f "$DOTFILES_DIR/udev/99-battery-charge-threshold.rules" ]; then
+        sudo cp -f "$DOTFILES_DIR/udev/99-battery-charge-threshold.rules" /etc/udev/rules.d/
+        sudo udevadm control --reload-rules 2>/dev/null || true
+    fi
+    if [ -f "$DOTFILES_DIR/systemd/battery-charge-threshold.service" ]; then
+        sudo cp -f "$DOTFILES_DIR/systemd/battery-charge-threshold.service" /etc/systemd/system/
+        sudo systemctl daemon-reload 2>/dev/null || true
+        sudo systemctl enable --now battery-charge-threshold.service 2>/dev/null || true
+    fi
+fi
+
+# 9. Penguatan Keamanan Sistem (Security Hardening)
+log "Menerapkan penguatan keamanan sistem..."
+
+# Aktifkan firewall (firewalld)
+if command -v firewall-cmd >/dev/null 2>&1; then
+    log "Mengaktifkan firewalld..."
+    sudo systemctl enable --now firewalld.service 2>/dev/null || true
+fi
+
+# Terapkan aturan sysctl keamanan
+if [ -f "$DOTFILES_DIR/security/99-security.conf" ]; then
+    log "Menerapkan aturan sysctl keamanan..."
+    sudo cp -f "$DOTFILES_DIR/security/99-security.conf" /etc/sysctl.d/
+    sudo sysctl --system >/dev/null 2>&1 || true
+fi
+
+# Lindungi direktori home dari akses user lain
+chmod 700 "$HOME" 2>/dev/null || true
+
+# 10. Restart Portal Services
 log "Restarting portal services..."
 systemctl --user restart xdg-desktop-portal.service 2>/dev/null || true
 systemctl --user restart xdg-desktop-portal-gnome.service 2>/dev/null || true

@@ -18,6 +18,7 @@
     "~/.config/waybar/modules/bluetooth.jsonc",
     "~/.config/waybar/modules/clipboard.jsonc",
     "~/.config/waybar/modules/notifications.jsonc",
+    "~/.config/waybar/modules/battery.jsonc",
     "~/.config/waybar/modules/power.jsonc",
     "~/.config/waybar/modules/cpu.jsonc",
     "~/.config/waybar/modules/memory.jsonc",
@@ -37,6 +38,7 @@
     "bluetooth",
     "custom/clipboard",
     "custom/notifications",
+    "battery",
     "custom/power",
   ],
 }

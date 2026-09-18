@@ -5,6 +5,7 @@ fuzzel
 mako
 swaybg
 swaylock
+swayidle
 xdg-desktop-portal-gnome
 
 # ── Terminal & Shell ───────────────────────────────────────────
@@ -26,6 +27,8 @@ adw-gtk3-theme
 
 # ── Dependencies ───────────────────────────────────────────────
 libnotify
+sound-theme-freedesktop
+libcanberra-gtk3
 bluez
 bluez-tools
 pavucontrol
@@ -33,6 +36,7 @@ NetworkManager
 NetworkManager-tui
 network-manager-applet
 nm-connection-editor
+firewalld
 python3
 unzip
 7zip
@@ -57,10 +61,25 @@ fastfetch
 gnome-keyring
 polkit-kde
 dbus-daemon
+bolt
+flatpak
 
-# ── Audio & Video ──────────────────────────────────────────────
+# ── Multimedia & Camera ────────────────────────────────────────
 pipewire-alsa
 pipewire-pulseaudio
 playerctl
 cava
 mpv
+loupe
+snapshot
+
+# ── Containers & Virtualization ────────────────────────────────
+podman
+podman-compose
+podman-docker
+
+# ── Printing & Scanning ────────────────────────────────────────
+cups
+cups-filters
+system-config-printer
+avahi

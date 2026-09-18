@@ -1,0 +1,3 @@
+# Maintain 80% maximum charge limit for battery longevity
+SUBSYSTEM=="power_supply", ATTR{type}=="Battery", ATTR{charge_control_end_threshold}="80"
+SUBSYSTEM=="power_supply", ATTR{type}=="Battery", ATTR{charge_stop_threshold}="80"

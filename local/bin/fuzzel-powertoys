@@ -1,0 +1,94 @@
+#!/bin/bash
+# PowerToys Run equivalent for Niri using Fuzzel
+# Features: Application Launcher, Web Search (? or g), Calculator (= or auto-math), Terminal Command (>), System Actions
+
+# Build initial list of quick actions and desktop apps
+ACTIONS="🧮 Calculator: type '= 25 * 4'
+🔍 Web Search: type '? search query'
+⚡ Run Command: type '> alacritty'
+🔒 Lock Screen
+⏾ Suspend / Sleep
+🖼 Change Wallpaper
+📋 Clipboard History
+⏻ Power Menu"
+
+APPS=$(find /usr/share/applications "$HOME/.local/share/applications" -name "*.desktop" 2>/dev/null | while read -r file; do
+    name=$(grep -m 1 "^Name=" "$file" 2>/dev/null | cut -d= -f2)
+    [ -n "$name" ] && echo "$name"
+done | sort -u)
+
+CHOICE=$(printf "%s\n%s\n" "$ACTIONS" "$APPS" | fuzzel --dmenu --prompt "Run: " --width 45 --lines 12)
+
+[ -z "$CHOICE" ] && exit 0
+
+# 1. Calculator (= <expr>)
+if [[ "$CHOICE" =~ ^=\ *(.*) ]]; then
+    EXPR="${BASH_REMATCH[1]}"
+    RESULT=$(python3 -c "import math; print($EXPR)" 2>/dev/null || echo "Error")
+    echo -n "$RESULT" | wl-copy 2>/dev/null || true
+    notify-send -i "accessories-calculator" "Calculator" "$EXPR = $RESULT (Copied)" 2>/dev/null || true
+    exit 0
+fi
+
+# 2. Web search (? <query> or g <query>)
+if [[ "$CHOICE" =~ ^(\?|g|google)\ +(.*) ]]; then
+    QUERY="${BASH_REMATCH[2]}"
+    ENCODED=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$QUERY")
+    firefox "https://www.google.com/search?q=$ENCODED" &
+    exit 0
+fi
+
+# 3. Shell execution (> <cmd>)
+if [[ "$CHOICE" =~ ^\>\ +(.*) ]]; then
+    CMD="${BASH_REMATCH[1]}"
+    eval "$CMD" &
+    notify-send "PowerToys" "Executed: $CMD" 2>/dev/null || true
+    exit 0
+fi
+
+# 4. Quick Action matches
+case "$CHOICE" in
+    "🔒 Lock Screen")
+        swaylock -f
+        exit 0
+        ;;
+    "⏾ Suspend / Sleep")
+        systemctl suspend
+        exit 0
+        ;;
+    "🖼 Change Wallpaper")
+        "$HOME/.local/bin/set-wallpaper"
+        exit 0
+        ;;
+    "📋 Clipboard History")
+        "$HOME/.local/bin/clipboard-history"
+        exit 0
+        ;;
+    "⏻ Power Menu")
+        "$HOME/.local/bin/powermenu"
+        exit 0
+        ;;
+    "🧮 Calculator:"*|"🔍 Web Search:"*|"⚡ Run Command:"*)
+        exit 0
+        ;;
+esac
+
+# 5. Desktop Application launch
+DESKTOP_FILE=$(grep -ril "^Name=$CHOICE$" /usr/share/applications "$HOME/.local/share/applications" 2>/dev/null | head -n 1)
+if [ -n "$DESKTOP_FILE" ]; then
+    EXEC_CMD=$(grep -m 1 "^Exec=" "$DESKTOP_FILE" | cut -d= -f2- | sed 's/ %[a-zA-Z]//g')
+    eval "$EXEC_CMD" &
+    exit 0
+fi
+
+# 6. Automatic math fallback (e.g. user typed '15 * 40' without '=')
+MATH_RESULT=$(python3 -c "import math; res = $CHOICE; print(res)" 2>/dev/null)
+if [ -n "$MATH_RESULT" ]; then
+    echo -n "$MATH_RESULT" | wl-copy 2>/dev/null || true
+    notify-send -i "accessories-calculator" "Calculator" "$CHOICE = $MATH_RESULT (Copied)" 2>/dev/null || true
+    exit 0
+fi
+
+# 7. Fallback to web search
+ENCODED=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$CHOICE")
+firefox "https://www.google.com/search?q=$ENCODED" &

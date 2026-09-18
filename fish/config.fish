@@ -31,6 +31,11 @@ if status is-interactive
     abbr -a -- gp 'git push'
     abbr -a -- gs 'git status'
     abbr -a -- gl 'git log --oneline --decorate --graph'
+    abbr -a -- p podman
+    abbr -a -- pc 'podman compose'
+
+    # Podman socket compatibility (Docker rootless socket)
+    set -gx DOCKER_HOST "unix:///run/user/"(id -u)"/podman/podman.sock"
 
     # Utilities
     function mkcd --description "mkdir and cd"

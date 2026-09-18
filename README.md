@@ -105,8 +105,16 @@ That's it. The installer handles:
 | `Mod + Return` | Open terminal (Alacritty) |
 | `Alt + Return` | Open terminal (Kitty) |
 | `Mod + Space` | Application launcher (Fuzzel) |
+| `Alt + Space` | PowerToys Run (Fuzzel calculator, web search, apps, commands) |
 | `Mod + B` | Open browser (Firefox) |
 | `Mod + E` | Open file manager (Nautilus) |
+| `Mod + Z` | Open editor (Zed) |
+| `Mod + V` | Open Discord (Vesktop) |
+| `Mod + Alt + W` | Interactive wallpaper picker |
+| `Mod + Shift + W` | Random wallpaper switcher |
+| `Mod + Shift + L` | Lock screen (Swaylock) |
+| `Mod + Shift + P` | Suspend / Sleep PC |
+| `Mod + Shift + I` | Toggle Caffeine / Idle sleep mode |
 | `Mod + T` | Power menu (Fuzzel-based) |
 | `Print` | Screenshot (Grim + Slurp + Swappy) |
 
@@ -170,10 +178,15 @@ That's it. The installer handles:
 | Script | Description | Dependencies |
 |--------|-------------|--------------|
 | `powermenu` | Fuzzel-based power menu (Shutdown/Reboot/Suspend/Logout/Lock) | fuzzel, systemctl, swaylock |
-| `set-wallpaper` | Interactive wallpaper picker using Fuzzel | fuzzel, swaybg |
+| `set-wallpaper` | Interactive wallpaper picker & random switcher | fuzzel, swaybg |
+| `fuzzel-powertoys` | PowerToys Run (calc `= 2+2`, web `? query`, run `> cmd`) | fuzzel, python3, wl-copy |
+| `battery-threshold` | Set and toggle battery charge limit (80% / 100%) | sysfs, notify-send |
+| `idle-manager` | Configurable idle screen lock & sleep manager | swayidle, swaylock, niri |
 | `clipboard-history` | Browse and select from clipboard history | cliphist, fuzzel, wl-copy |
 | `notification-history` | Browse notification history | fuzzel, makoctl |
 | `mako-history` | View Mako notification log | fuzzel |
+| `whatsapp` | Launch WhatsApp Web in Firefox | firefox |
+| `spotify` | Launch Spotify Web in Firefox | firefox |
 
 ### Waybar Scripts (`waybar/scripts/`)
 

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Spotify
+GenericName=Music Player
+Comment=Spotify Web in Firefox
+Exec=firefox --new-window https://open.spotify.com
+Icon=spotify
+Terminal=false
+Type=Application
+Categories=Audio;Music;Player;AudioVideo;
+StartupNotify=true

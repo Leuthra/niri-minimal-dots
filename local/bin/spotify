@@ -1,0 +1,3 @@
+#!/bin/sh
+# Launch Spotify Web in Firefox
+exec firefox --new-window "https://open.spotify.com"

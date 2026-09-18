@@ -48,6 +48,7 @@ tooltip label {
 #bluetooth,
 #custom-clipboard,
 #custom-notifications,
+#battery,
 #cpu,
 #custom-power,
 #memory {
@@ -192,6 +193,26 @@ tooltip label {
     border-color: rgba(243, 139, 168, 0.28);
 }
 
+/* ── BATTERY ── */
+#battery {
+    color: #b5c0b3;
+}
+
+#battery.charging,
+#battery.plugged {
+    color: #a6e3a1;
+}
+
+#battery.warning:not(.charging) {
+    color: #f9e2af;
+    background: rgba(249, 226, 175, 0.15);
+}
+
+#battery.critical:not(.charging) {
+    color: #f38ba8;
+    background: rgba(243, 139, 168, 0.2);
+}
+
 /* ── POWER — explicitly sized so it always shows background ── */
 #custom-power {
     color: #ef757b;
@@ -216,6 +237,7 @@ tooltip label {
 #custom-player:hover,
 #custom-clipboard:hover,
 #custom-power:hover,
+#battery:hover,
 #custom-notifications:hover {
     /*background: rgba(49, 50, 68, 0.88);*/
     /*border-color: rgba(180, 190, 254, 0.28);*/

@@ -1,0 +1,46 @@
+#!/bin/bash
+# Battery charge threshold manager (80% / 100%)
+
+BAT_DIR=$(find /sys/class/power_supply -name "BAT*" 2>/dev/null | head -n 1)
+
+if [ -z "$BAT_DIR" ]; then
+    echo "No battery found on this system."
+    exit 0
+fi
+
+if [ -f "$BAT_DIR/charge_control_end_threshold" ]; then
+    TARGET="$BAT_DIR/charge_control_end_threshold"
+elif [ -f "$BAT_DIR/charge_stop_threshold" ]; then
+    TARGET="$BAT_DIR/charge_stop_threshold"
+else
+    notify-send "Battery" "Hardware does not support kernel charge threshold control." 2>/dev/null || true
+    echo "Charge threshold control not supported by this hardware."
+    exit 1
+fi
+
+CURRENT=$(cat "$TARGET" 2>/dev/null || echo "100")
+
+case "${1:-}" in
+    --status)
+        echo "$CURRENT"
+        ;;
+    --toggle)
+        if [ "$CURRENT" -eq 80 ]; then
+            NEW_LIMIT=100
+        else
+            NEW_LIMIT=80
+        fi
+        sudo sh -c "echo $NEW_LIMIT > '$TARGET'"
+        notify-send -i battery "Battery Limit" "Charge threshold set to ${NEW_LIMIT}%" 2>/dev/null || true
+        ;;
+    *)
+        NEW_LIMIT="${1:-80}"
+        if [ "$EUID" -ne 0 ]; then
+            sudo sh -c "echo $NEW_LIMIT > '$TARGET'"
+        else
+            echo "$NEW_LIMIT" > "$TARGET"
+        fi
+        notify-send -i battery "Battery Limit" "Charge threshold set to ${NEW_LIMIT}%" 2>/dev/null || true
+        echo "Charge threshold set to ${NEW_LIMIT}%"
+        ;;
+esac

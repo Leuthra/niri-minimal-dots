@@ -65,3 +65,6 @@ mozilla/
 *.deb
 *.rpm
 *.AppImage
+
+# TODO
+todo.md

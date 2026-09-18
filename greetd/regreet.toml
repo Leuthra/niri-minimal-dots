@@ -1,0 +1,10 @@
+[background]
+path = "/usr/share/backgrounds/login-wallpaper.jpg"
+fit = "Cover"
+
+[GTK]
+application_prefer_dark_theme = true
+cursor_theme_name = "Adwaita"
+font_name = "Cascadia Code NF 11"
+icon_theme_name = "Papirus-Dark"
+theme_name = "adw-gtk3-dark"
