@@ -23,8 +23,7 @@ binds {
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+Return hotkey-overlay-title="Open a Terminal: alacritty" { spawn "alacritty"; }
-    Mod+Space hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
-    Alt+Space hotkey-overlay-title="PowerToys Run: fuzzel" { spawn-sh "$HOME/.local/bin/fuzzel-powertoys"; }
+    Mod+Space hotkey-overlay-title="Launcher / PowerToys: fuzzel" { spawn-sh "$HOME/.local/bin/fuzzel-powertoys"; }
 
     // Custom Application Shortcuts
     // Mod+C { spawn "code"; }

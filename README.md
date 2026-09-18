@@ -104,8 +104,7 @@ That's it. The installer handles:
 |------------|--------|
 | `Mod + Return` | Open terminal (Alacritty) |
 | `Alt + Return` | Open terminal (Kitty) |
-| `Mod + Space` | Application launcher (Fuzzel) |
-| `Alt + Space` | PowerToys Run (Fuzzel calculator, web search, apps, commands) |
+| `Mod + Space` | Launcher & PowerToys Run (Fuzzel apps, calc, search, commands) |
 | `Mod + B` | Open browser (Firefox) |
 | `Mod + E` | Open file manager (Nautilus) |
 | `Mod + Z` | Open editor (Zed) |
