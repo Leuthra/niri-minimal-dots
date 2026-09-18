@@ -306,12 +306,13 @@ if command -v firewall-cmd >/dev/null 2>&1; then
     sudo systemctl enable --now firewalld.service 2>/dev/null || true
 fi
 
-# Terapkan aturan sysctl keamanan (dapat di-skip jika non-interaktif atau user menolak)
+# Terapkan aturan sysctl keamanan (opsional, default: no)
 if [ -f "$DOTFILES_DIR/security/99-security.conf" ]; then
-    apply_sec="y"
+    apply_sec="n"
     if [ -t 0 ]; then
-        read -r -p "Terapkan aturan sysctl security hardening (ptrace_scope, rp_filter)? [Y/n] " answer
-        [[ "$answer" =~ ^[Nn]$ ]] && apply_sec="n"
+        echo -e "${YELLOW}[!]${NC} Catatan: sysctl hardening (ptrace_scope, rp_filter) dapat memengaruhi debugger, VPN, atau container."
+        read -r -p "Terapkan aturan sysctl security hardening? [y/N] " answer
+        [[ "$answer" =~ ^[Yy]$ ]] && apply_sec="y"
     fi
 
     if [ "$apply_sec" = "y" ]; then
@@ -319,7 +320,7 @@ if [ -f "$DOTFILES_DIR/security/99-security.conf" ]; then
         sudo cp -f "$DOTFILES_DIR/security/99-security.conf" /etc/sysctl.d/
         sudo sysctl --system >/dev/null 2>&1 || true
     else
-        log "Melewati aturan sysctl keamanan sesuai pilihan pengguna."
+        log "Melewati aturan sysctl keamanan (default aman untuk developer/workload umum)."
     fi
 fi
 

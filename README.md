@@ -149,6 +149,7 @@ That's it. The installer handles:
 |------------|--------|
 | `Mod + Shift + H/J/K/L` | Focus monitor left/down/up/right |
 | `Mod + Shift + Ctrl + H/J/K/L` | Move window to monitor |
+| `Mod + Shift + M` | Turn off monitors |
 
 ### Media Keys
 
