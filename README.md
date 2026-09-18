@@ -111,9 +111,9 @@ That's it. The installer handles:
 | `Mod + V` | Open Discord (Vesktop) |
 | `Mod + Alt + W` | Interactive wallpaper picker |
 | `Mod + Shift + W` | Random wallpaper switcher |
-| `Mod + Shift + L` | Lock screen (Swaylock) |
+| `Mod + Alt + L` | Lock screen (Swaylock) |
 | `Mod + Shift + P` | Suspend / Sleep PC |
-| `Mod + Shift + I` | Toggle Caffeine / Idle sleep mode |
+| `Mod + Alt + I` | Toggle Caffeine / Idle sleep mode |
 | `Mod + T` | Power menu (Fuzzel-based) |
 | `Print` | Screenshot (Grim + Slurp + Swappy) |
 

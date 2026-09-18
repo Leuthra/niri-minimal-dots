@@ -17,9 +17,9 @@ binds {
 
     // Power menu (Fuzzel custom)
     Mod+T { spawn-sh "$HOME/.local/bin/powermenu"; }
-    Mod+Shift+L hotkey-overlay-title="Lock Screen: swaylock" { spawn "swaylock" "-f"; }
+    Mod+Alt+L hotkey-overlay-title="Lock Screen: swaylock" { spawn "swaylock" "-f"; }
     Mod+Shift+P hotkey-overlay-title="Suspend/Sleep PC" { spawn "systemctl" "suspend"; }
-    Mod+Shift+I hotkey-overlay-title="Toggle Idle/Caffeine Mode" { spawn-sh "$HOME/.local/bin/idle-manager --toggle"; }
+    Mod+Alt+I hotkey-overlay-title="Toggle Idle/Caffeine Mode" { spawn-sh "$HOME/.local/bin/idle-manager --toggle"; }
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+Return hotkey-overlay-title="Open a Terminal: alacritty" { spawn "alacritty"; }
@@ -109,7 +109,6 @@ binds {
     Mod+Shift+J     { focus-monitor-down; }
     Mod+Shift+K     { focus-monitor-up; }
     Mod+Shift+L     { focus-monitor-right; }
-    Print { spawn-sh "grim -g \"$(slurp)\" - | swappy -f -"; }
 
 
     Mod+Shift+Ctrl+Left  { move-column-to-monitor-left; }
