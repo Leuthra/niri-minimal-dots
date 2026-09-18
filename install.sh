@@ -128,8 +128,9 @@ if ! command -v starship >/dev/null 2>&1; then
     mkdir -p "$HOME/.local/bin"
 
     if command -v curl >/dev/null 2>&1; then
-        curl -sS https://starship.rs/install.sh | \
+        curl --fail --silent --show-error https://starship.rs/install.sh | \
             sh -s -- -y -b "$HOME/.local/bin"
+        command -v "$HOME/.local/bin/starship" >/dev/null 2>&1 || error "Starship gagal dipasang."
     else
         error "curl is required to install Starship"
     fi
@@ -276,10 +277,10 @@ if sudo dnf install -y greetd greetd-selinux cage regreet plymouth plymouth-syst
         sudo systemctl disable sddm.service 2>/dev/null || true
         sudo systemctl enable greetd.service 2>/dev/null || true
     else
-        warn "greetd, cage, atau regreet belum lengkap terpasang. Display manager lama tidak diubah."
+        error "greetd, cage, atau regreet belum lengkap terpasang. Display manager lama tidak diubah."
     fi
 else
-    warn "Gagal memasang greetd/cage/regreet/Plymouth. Display manager tidak diubah."
+    error "Gagal memasang greetd/cage/regreet/Plymouth. Display manager tidak diubah."
 fi
 
 # 8. Setup Battery Charge Threshold (80%) jika didukung hardware
