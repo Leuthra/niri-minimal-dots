@@ -27,10 +27,10 @@ binds {
 
     // Custom Application Shortcuts
     // Mod+C { spawn "code"; }
-    Mod+V hotkey-overlay-title="Open Discord: vesktop" { spawn-sh "flatpak run dev.vencord.Vesktop || vesktop"; }
+    Mod+V hotkey-overlay-title="Open Discord: vesktop" { spawn-sh "flatpak run dev.vencord.Vesktop"; }
     Mod+E { spawn "nautilus"; }
     Mod+B { spawn "firefox"; }
-    Mod+Z hotkey-overlay-title="Open Editor: zed" { spawn-sh "$HOME/.local/bin/zed || zed"; }
+    Mod+Z hotkey-overlay-title="Open Editor: zed" { spawn-sh "command -v zed >/dev/null 2>&1 && zed || $HOME/.local/bin/zed"; }
     Mod+Alt+W hotkey-overlay-title="Change Wallpaper: Menu" { spawn-sh "$HOME/.local/bin/set-wallpaper"; }
     Mod+Shift+W hotkey-overlay-title="Change Wallpaper: Random" { spawn-sh "$HOME/.local/bin/set-wallpaper --random"; }
     Alt+Return { spawn "kitty";}

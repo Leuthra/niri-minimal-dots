@@ -26,8 +26,12 @@ dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 
 # Wallpaper (persisten dari pilihan terakhir)
 SAVED_WALL="$HOME/.config/niri/current-wallpaper"
-if [ -f "$SAVED_WALL" ] && [ -f "$(cat "$SAVED_WALL")" ]; then
-    swaybg -i "$(cat "$SAVED_WALL")" -m fill &
+if [ -f "$SAVED_WALL" ]; then
+    WALL="$(cat "$SAVED_WALL")"
+fi
+
+if [ -n "${WALL:-}" ] && [ -f "$WALL" ]; then
+    swaybg -i "$WALL" -m fill &
 else
     swaybg -i "$HOME/Pictures/wallpapers/forest_dark_winter.jpg" -m fill &
 fi

@@ -8,12 +8,7 @@ STATE_FILE="$HOME/.config/niri/current-wallpaper"
 mkdir -p "$(dirname "$STATE_FILE")"
 
 detect_setter() {
-    if [ -n "$WAYLAND_DISPLAY" ]; then
-        for cmd in swww swaybg hyprpaper xwallpaper; do
-            command -v "$cmd" >/dev/null 2>&1 && echo "$cmd" && return
-        done
-    fi
-    for cmd in feh nitrogen xwallpaper; do
+    for cmd in swww swaybg hyprpaper; do
         command -v "$cmd" >/dev/null 2>&1 && echo "$cmd" && return
     done
     echo "none"
@@ -36,10 +31,8 @@ set_wallpaper() {
             swww img "$wall" --transition-type fade ;;
         hyprpaper)
             hyprctl hyprpaper wallpaper ",$wall" ;;
-        feh)
-            feh --bg-fill "$wall" ;;
         *)
-            notify-send "Wallpaper" "No supported wallpaper setter found!" 2>/dev/null
+            notify-send "Wallpaper" "No supported Wayland wallpaper setter found (install swaybg or swww)!" 2>/dev/null
             exit 1
             ;;
     esac

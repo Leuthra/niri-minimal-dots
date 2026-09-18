@@ -234,47 +234,57 @@ log "Memastikan permissions skrip..."
 # 7. Setup Login Screen (ReGreet) & Boot Splash (Plymouth)
 log "Mengonfigurasi ReGreet & Plymouth..."
 
+# Pastikan dnf copr didukung (dnf-plugins-core)
+if ! dnf copr --help >/dev/null 2>&1; then
+    log "Memasang dnf-plugins-core untuk dukungan copr..."
+    sudo dnf install -y dnf-plugins-core || warn "Gagal memasang dnf-plugins-core."
+fi
+
 # Enable COPR untuk ReGreet jika belum aktif
-if ! dnf repolist 2>/dev/null | grep -qi "regreet"; then
+if dnf copr --help >/dev/null 2>&1 && ! dnf repolist 2>/dev/null | grep -qi "regreet"; then
     log "Mengaktifkan COPR mystical-devil/ReGreet..."
     sudo dnf copr enable -y mystical-devil/ReGreet || warn "Gagal mengaktifkan COPR ReGreet."
 fi
 
-# Install komponen greetd, cage, regreet, plymouth
+# Install komponen greetd, cage, regreet, plymouth (Fail-fast check)
 log "Menginstal paket login & boot..."
-sudo dnf install -y greetd greetd-selinux cage regreet plymouth plymouth-system-theme || warn "Gagal menginstal beberapa paket login/boot."
+if sudo dnf install -y greetd greetd-selinux cage regreet plymouth plymouth-system-theme; then
+    # Setup wallpaper sistem untuk greeter
+    sudo mkdir -p /usr/share/backgrounds
+    if [ -f "$DOTFILES_DIR/wallpapers/forest_dark_winter.jpg" ]; then
+        sudo cp -f "$DOTFILES_DIR/wallpapers/forest_dark_winter.jpg" /usr/share/backgrounds/login-wallpaper.jpg
+    fi
 
-# Setup wallpaper sistem untuk greeter
-sudo mkdir -p /usr/share/backgrounds
-if [ -f "$DOTFILES_DIR/wallpapers/forest_dark_winter.jpg" ]; then
-    sudo cp -f "$DOTFILES_DIR/wallpapers/forest_dark_winter.jpg" /usr/share/backgrounds/login-wallpaper.jpg
-fi
+    # Pasang konfigurasi greetd
+    if [ -d "$DOTFILES_DIR/greetd" ]; then
+        sudo mkdir -p /etc/greetd
+        sudo cp -f "$DOTFILES_DIR/greetd/config.toml" /etc/greetd/config.toml
+        sudo cp -f "$DOTFILES_DIR/greetd/regreet.toml" /etc/greetd/regreet.toml
+        sudo chmod -R 755 /etc/greetd
+    fi
 
-# Pasang konfigurasi greetd
-if [ -d "$DOTFILES_DIR/greetd" ]; then
-    sudo mkdir -p /etc/greetd
-    sudo cp -f "$DOTFILES_DIR/greetd/config.toml" /etc/greetd/config.toml
-    sudo cp -f "$DOTFILES_DIR/greetd/regreet.toml" /etc/greetd/regreet.toml
-    sudo chmod -R 755 /etc/greetd
-fi
+    # Set tema boot Plymouth ke spinner
+    if command -v plymouth-set-default-theme >/dev/null 2>&1; then
+        log "Mengatur tema boot Plymouth ke spinner..."
+        sudo plymouth-set-default-theme spinner -R 2>/dev/null || true
+    fi
 
-# Set tema boot Plymouth ke spinner
-if command -v plymouth-set-default-theme >/dev/null 2>&1; then
-    log "Mengatur tema boot Plymouth ke spinner..."
-    sudo plymouth-set-default-theme spinner -R 2>/dev/null || true
-fi
-
-# Aktifkan greetd service (gantikan GDM/SDDM)
-if command -v greetd >/dev/null 2>&1; then
-    log "Mengaktifkan greetd service..."
-    sudo systemctl disable gdm 2>/dev/null || true
-    sudo systemctl disable sddm 2>/dev/null || true
-    sudo systemctl enable greetd.service 2>/dev/null || true
+    # Aktifkan greetd service hanya jika binary greetd, cage, dan regreet benar-benar tersedia
+    if command -v greetd >/dev/null 2>&1 && command -v cage >/dev/null 2>&1 && command -v regreet >/dev/null 2>&1; then
+        log "Mengaktifkan greetd service (mengganti display manager aktif)..."
+        sudo systemctl disable gdm.service 2>/dev/null || true
+        sudo systemctl disable sddm.service 2>/dev/null || true
+        sudo systemctl enable greetd.service 2>/dev/null || true
+    else
+        warn "greetd, cage, atau regreet belum lengkap terpasang. Display manager lama tidak diubah."
+    fi
+else
+    warn "Gagal memasang greetd/cage/regreet/Plymouth. Display manager tidak diubah."
 fi
 
 # 8. Setup Battery Charge Threshold (80%) jika didukung hardware
 if [ -d "/sys/class/power_supply" ] && ls /sys/class/power_supply/BAT* >/dev/null 2>&1; then
-    log "Mengonfigurasi batas charge baterai 80%..."
+    log "Mengonfigurasi batas charge baterai 80% (opsional jika didukung hardware)..."
     if [ -f "$DOTFILES_DIR/udev/99-battery-charge-threshold.rules" ]; then
         sudo cp -f "$DOTFILES_DIR/udev/99-battery-charge-threshold.rules" /etc/udev/rules.d/
         sudo udevadm control --reload-rules 2>/dev/null || true
@@ -295,11 +305,21 @@ if command -v firewall-cmd >/dev/null 2>&1; then
     sudo systemctl enable --now firewalld.service 2>/dev/null || true
 fi
 
-# Terapkan aturan sysctl keamanan
+# Terapkan aturan sysctl keamanan (dapat di-skip jika non-interaktif atau user menolak)
 if [ -f "$DOTFILES_DIR/security/99-security.conf" ]; then
-    log "Menerapkan aturan sysctl keamanan..."
-    sudo cp -f "$DOTFILES_DIR/security/99-security.conf" /etc/sysctl.d/
-    sudo sysctl --system >/dev/null 2>&1 || true
+    apply_sec="y"
+    if [ -t 0 ]; then
+        read -r -p "Terapkan aturan sysctl security hardening (ptrace_scope, rp_filter)? [Y/n] " answer
+        [[ "$answer" =~ ^[Nn]$ ]] && apply_sec="n"
+    fi
+
+    if [ "$apply_sec" = "y" ]; then
+        log "Menerapkan aturan sysctl keamanan..."
+        sudo cp -f "$DOTFILES_DIR/security/99-security.conf" /etc/sysctl.d/
+        sudo sysctl --system >/dev/null 2>&1 || true
+    else
+        log "Melewati aturan sysctl keamanan sesuai pilihan pengguna."
+    fi
 fi
 
 # Lindungi direktori home dari akses user lain

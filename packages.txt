@@ -38,6 +38,7 @@ network-manager-applet
 nm-connection-editor
 firewalld
 python3
+dnf-plugins-core
 unzip
 7zip
 unrar

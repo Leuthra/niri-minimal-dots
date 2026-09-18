@@ -41,8 +41,7 @@ fi
 # 3. Shell execution (> <cmd>)
 if [[ "$CHOICE" =~ ^\>\ +(.*) ]]; then
     CMD="${BASH_REMATCH[1]}"
-    eval "$CMD" &
-    notify-send "PowerToys" "Executed: $CMD" 2>/dev/null || true
+    alacritty -e bash -lc "$CMD" &
     exit 0
 fi
 
