@@ -22,7 +22,7 @@
         {
             "type": "host",
             "key": "│ \u001b[1;34m󰌢 Host   {#keys}│",
-            "format": "{host-name}"
+            "format": "{name}"
         },
 
         {
