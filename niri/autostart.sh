@@ -25,7 +25,7 @@ gsettings set org.gnome.desktop.privacy disable-camera false 2>/dev/null &
     done
 ) &
 
-# Wallpaper (persisten dari pilihan terakhir)
+# Wallpaper (restore last selected)
 SAVED_WALL="$HOME/.config/niri/current-wallpaper"
 if [ -f "$SAVED_WALL" ]; then
     WALL="$(cat "$SAVED_WALL")"
