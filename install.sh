@@ -167,10 +167,12 @@ fi
 # 2. Buat struktur folder
 log "Membuat struktur direktori..."
 mkdir -p ~/.config ~/.local/bin ~/.local/share/screenshots
-mkdir -p ~/.config/xdg-desktop-portal
-if [ -d "$HOME/Pictures" ]; then
-    mkdir -p "$HOME/Pictures/Screenshots"
-fi
+# Matikan pembuatan folder otomatis bawaan XDG (Pictures, Downloads, Templates, dll)
+echo "enabled=False" > "$HOME/.config/user-dirs.conf" 2>/dev/null || true
+
+# Bersihkan folder kosong yang tidak diinginkan di $HOME jika ada
+[ -d "$HOME/bruno" ] && rmdir "$HOME/bruno" 2>/dev/null || true
+[ -d "$HOME/Bruno" ] && rmdir "$HOME/Bruno" 2>/dev/null || true
 
 # 3. Symlink konfigurasi utama (Idempotent)
 log "Melakukan symlink konfigurasi ke ~/.config..."
