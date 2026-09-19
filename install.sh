@@ -104,6 +104,12 @@ if [ -f "$DOTFILES_DIR/packages.txt" ]; then
             sudo systemctl enable --now cups.service 2>/dev/null || true
             sudo systemctl enable --now avahi-daemon.service 2>/dev/null || true
         fi
+
+        # User video group for webcam access
+        if getent group video >/dev/null 2>&1; then
+            log "Menambahkan user ke group video untuk akses webcam/kamera..."
+            sudo usermod -aG video "$USER" 2>/dev/null || true
+        fi
     fi
 else
     warn "packages.txt tidak ditemukan, melewati instalasi paket."
@@ -340,8 +346,26 @@ fi
 # Lindungi direktori home dari akses user lain
 chmod 700 "$HOME" 2>/dev/null || true
 
-# 10. Restart Portal Services
+# 10. Konfigurasi Izin Privasi Kamera & Reset PermissionStore
+log "Mengonfigurasi izin kamera dan multimedia..."
+if command -v gsettings >/dev/null 2>&1; then
+    gsettings set org.gnome.desktop.privacy disable-camera false 2>/dev/null || true
+fi
+
+if command -v dbus-send >/dev/null 2>&1; then
+    dbus-send --session --print-reply --dest=org.freedesktop.impl.portal.PermissionStore \
+        /org/freedesktop/impl/portal/PermissionStore \
+        org.freedesktop.impl.portal.PermissionStore.DeletePermission \
+        string:'devices' string:'camera' string:'' 2>/dev/null || true
+fi
+
+if command -v flatpak >/dev/null 2>&1; then
+    flatpak permission-reset org.gnome.Snapshot 2>/dev/null || true
+fi
+
+# 11. Restart Portal Services
 log "Restarting portal services..."
+systemctl --user restart pipewire.service wireplumber.service 2>/dev/null || true
 systemctl --user restart xdg-desktop-portal.service 2>/dev/null || true
 systemctl --user restart xdg-desktop-portal-gnome.service 2>/dev/null || true
 

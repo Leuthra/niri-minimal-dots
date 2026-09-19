@@ -13,6 +13,7 @@ export GTK_USE_PORTAL=1
 
 # Export to DBus (REQUIRED)
 dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP &
+gsettings set org.gnome.desktop.privacy disable-camera false 2>/dev/null &
 
 (
     for i in $(seq 1 50); do
