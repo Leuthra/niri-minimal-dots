@@ -2,6 +2,12 @@
 # PowerToys Run equivalent for Niri using Fuzzel
 # Features: Application Launcher (native & flatpak), Web Search (? or g), Calculator (= or auto-math), Terminal Command (>), System Actions
 
+# Toggle: if fuzzel is already running, close it and exit
+if pgrep -x "fuzzel" >/dev/null 2>&1; then
+    killall fuzzel 2>/dev/null || true
+    exit 0
+fi
+
 # Build initial list of quick actions
 ACTIONS="🧮 Calculator: type '= 25 * 4'
 🔍 Web Search: type '? search query'
@@ -23,7 +29,7 @@ for d in \
     [ -d "$d" ] && APP_DIRS+=("$d")
 done
 
-APPS=$(find -L "${APP_DIRS[@]}" -name "*.desktop" 2>/dev/null | while read -r file; do
+APPS=$(find "${APP_DIRS[@]}" -maxdepth 2 -name "*.desktop" 2>/dev/null | while read -r file; do
     grep -qi "^NoDisplay=true" "$file" 2>/dev/null && continue
     name=$(grep -m 1 "^Name=" "$file" 2>/dev/null | cut -d= -f2- | tr -d '\r')
     [ -n "$name" ] && echo "$name"
@@ -85,29 +91,18 @@ case "$CHOICE" in
 esac
 
 # 5. Desktop Application launch
-# First, exact match on Name
-DESKTOP_FILE=$(find -L "${APP_DIRS[@]}" -name "*.desktop" 2>/dev/null | while read -r file; do
+DESKTOP_FILE=""
+while read -r file; do
     name=$(grep -m 1 "^Name=" "$file" 2>/dev/null | cut -d= -f2- | tr -d '\r')
-    if [ "$name" = "$CHOICE" ]; then
-        echo "$file"
+    if [ "$name" = "$CHOICE" ] || [[ "${name,,}" == "${CHOICE,,}" ]]; then
+        DESKTOP_FILE="$file"
         break
     fi
-done | head -n 1)
-
-# Fallback: case-insensitive Name match
-if [ -z "$DESKTOP_FILE" ]; then
-    DESKTOP_FILE=$(find -L "${APP_DIRS[@]}" -name "*.desktop" 2>/dev/null | while read -r file; do
-        name=$(grep -m 1 "^Name=" "$file" 2>/dev/null | cut -d= -f2- | tr -d '\r')
-        if [[ "${name,,}" == "${CHOICE,,}" ]]; then
-            echo "$file"
-            break
-        fi
-    done | head -n 1)
-fi
+done < <(find "${APP_DIRS[@]}" -maxdepth 2 -name "*.desktop" 2>/dev/null)
 
 # Fallback: filename contains choice (e.g. 'obs' -> 'com.obsproject.Studio.desktop')
 if [ -z "$DESKTOP_FILE" ]; then
-    DESKTOP_FILE=$(find -L "${APP_DIRS[@]}" -iname "*$CHOICE*.desktop" 2>/dev/null | head -n 1)
+    DESKTOP_FILE=$(find "${APP_DIRS[@]}" -maxdepth 2 -iname "*$CHOICE*.desktop" 2>/dev/null | head -n 1)
 fi
 
 if [ -n "$DESKTOP_FILE" ]; then
