@@ -264,12 +264,22 @@ if sudo dnf install -y greetd greetd-selinux cage regreet plymouth plymouth-syst
         sudo plymouth-set-default-theme spinner -R 2>/dev/null || true
     fi
 
+    if ! id "greeter" >/dev/null 2>&1; then
+        log "Creating system user 'greeter' for greetd..."
+        sudo useradd -r -M -d /var/lib/greeter -G video,input -s /sbin/nologin greeter 2>/dev/null || true
+    else
+        sudo usermod -aG video,input greeter 2>/dev/null || true
+    fi
+    sudo mkdir -p /var/lib/greeter /var/log/regreet /var/cache/regreet
+    sudo chown -R greeter:greeter /var/lib/greeter /var/log/regreet /var/cache/regreet 2>/dev/null || true
+
     if command -v greetd >/dev/null 2>&1 && command -v cage >/dev/null 2>&1 && command -v regreet >/dev/null 2>&1; then
         log "Enabling greetd service and graphical target..."
         sudo systemctl set-default graphical.target 2>/dev/null || true
         sudo systemctl disable gdm.service 2>/dev/null || true
         sudo systemctl disable sddm.service 2>/dev/null || true
         sudo systemctl enable greetd.service 2>/dev/null || true
+        sudo systemctl restart greetd.service 2>/dev/null || true
     else
         warn "greetd/cage/regreet incomplete, skipping display manager switch."
     fi
