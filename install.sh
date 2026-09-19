@@ -299,7 +299,7 @@ else
 fi
 
 # 8. Battery charge threshold (80%) if supported
-if [ -d "/sys/class/power_supply" ] && ls /sys/class/power_supply/BAT* >/dev/null 2>&1; then
+if ls /sys/class/power_supply/BAT*/charge_control_end_threshold >/dev/null 2>&1 || ls /sys/class/power_supply/BAT*/charge_stop_threshold >/dev/null 2>&1; then
     log "Configuring battery charge limit (80%)..."
     if [ -f "$DOTFILES_DIR/udev/99-battery-charge-threshold.rules" ]; then
         sudo cp -f "$DOTFILES_DIR/udev/99-battery-charge-threshold.rules" /etc/udev/rules.d/
@@ -309,6 +309,17 @@ if [ -d "/sys/class/power_supply" ] && ls /sys/class/power_supply/BAT* >/dev/nul
         sudo cp -f "$DOTFILES_DIR/systemd/battery-charge-threshold.service" /etc/systemd/system/
         sudo systemctl daemon-reload 2>/dev/null || true
         sudo systemctl enable --now battery-charge-threshold.service 2>/dev/null || true
+    fi
+else
+    # Cleanup stale udev rules if hardware doesn't support kernel threshold
+    if [ -f "/etc/udev/rules.d/99-battery-charge-threshold.rules" ]; then
+        sudo rm -f "/etc/udev/rules.d/99-battery-charge-threshold.rules"
+        sudo udevadm control --reload-rules 2>/dev/null || true
+    fi
+    if systemctl is-enabled battery-charge-threshold.service >/dev/null 2>&1; then
+        sudo systemctl disable --now battery-charge-threshold.service 2>/dev/null || true
+        sudo rm -f "/etc/systemd/system/battery-charge-threshold.service"
+        sudo systemctl daemon-reload 2>/dev/null || true
     fi
 fi
 
