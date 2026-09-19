@@ -38,10 +38,11 @@ esac
 pkill -x swayidle 2>/dev/null || true
 
 # Run swayidle
+# Lock commands are non-blocking to prevent swayidle from freezing during lockscreen
 exec swayidle -w \
-    timeout "$LOCK_TIMEOUT" "$HOME/.local/bin/lockscreen" \
+    timeout "$LOCK_TIMEOUT" 'pgrep -x hyprlock >/dev/null 2>&1 || pgrep -x swaylock >/dev/null 2>&1 || "$HOME/.local/bin/lockscreen" &' \
     timeout "$SCREEN_OFF_TIMEOUT" 'niri msg action power-off-monitors' \
         resume 'niri msg action power-on-monitors' \
     timeout "$SUSPEND_TIMEOUT" 'systemctl suspend' \
-    before-sleep "$HOME/.local/bin/lockscreen" \
+    before-sleep 'pgrep -x hyprlock >/dev/null 2>&1 || pgrep -x swaylock >/dev/null 2>&1 || ("$HOME/.local/bin/lockscreen" & sleep 0.5)' \
     after-resume 'niri msg action power-on-monitors'
