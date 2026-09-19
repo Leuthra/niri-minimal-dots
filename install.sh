@@ -285,15 +285,14 @@ EOF
     sudo mkdir -p /var/lib/greeter /var/log/regreet /var/cache/regreet
     sudo chown -R greeter:greeter /var/lib/greeter /var/log/regreet /var/cache/regreet 2>/dev/null || true
 
-    if command -v greetd >/dev/null 2>&1 && command -v cage >/dev/null 2>&1 && command -v regreet >/dev/null 2>&1; then
+    if command -v greetd >/dev/null 2>&1; then
         log "Enabling greetd service and graphical target..."
         sudo systemctl set-default graphical.target 2>/dev/null || true
         sudo systemctl disable gdm.service 2>/dev/null || true
         sudo systemctl disable sddm.service 2>/dev/null || true
         sudo systemctl enable greetd.service 2>/dev/null || true
-        sudo systemctl restart greetd.service 2>/dev/null || true
     else
-        warn "greetd/cage/regreet incomplete, skipping display manager switch."
+        warn "greetd not found, skipping display manager switch."
     fi
 else
     warn "Failed to install greetd/regreet/plymouth. Keeping existing display manager."
@@ -324,7 +323,7 @@ if [ -f "$DOTFILES_DIR/security/99-security.conf" ]; then
     apply_sec="n"
     if [ -t 0 ]; then
         echo -e "${YELLOW}[!]${NC} Note: sysctl hardening (ptrace_scope, rp_filter) may affect debuggers, VPNs, or containers."
-        read -r -p "Apply sysctl security hardening? [y/N] " answer
+        read -r -t 15 -p "Apply sysctl security hardening? [y/N] (default: N in 15s): " answer || answer="n"
         [[ "$answer" =~ ^[Yy]$ ]] && apply_sec="y"
     fi
 
@@ -384,3 +383,4 @@ systemctl --user restart xdg-desktop-portal.service 2>/dev/null || true
 systemctl --user restart xdg-desktop-portal-gnome.service 2>/dev/null || true
 
 log "Dotfiles installation completed successfully!"
+log "To finish setup and boot directly into lockscreen, restart your PC: sudo reboot"
