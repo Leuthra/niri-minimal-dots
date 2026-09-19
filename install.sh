@@ -164,13 +164,9 @@ if ! command -v zed >/dev/null 2>&1 && [ ! -f "$HOME/.local/bin/zed" ]; then
     fi
 fi
 
-# Install LADSPA RNNoise plugin untuk PipeWire (Noise Canceling Microphone)
-if ! rpm -q ladspa-noise-suppression-for-voice >/dev/null 2>&1 && [ ! -f "/usr/lib64/ladspa/librnnoise_ladspa.so" ] && [ ! -f "/usr/lib/ladspa/librnnoise_ladspa.so" ]; then
-    log "Menginstal LADSPA Noise Suppression (RNNoise) untuk PipeWire..."
-    if sudo dnf copr enable -y ycollet/linuxmao 2>/dev/null; then
-        sudo dnf install -y ladspa-noise-suppression-for-voice 2>/dev/null || warn "Gagal menginstal ladspa-noise-suppression-for-voice dari COPR."
-    fi
-fi
+# Bersihkan sisa konfigurasi denoising pipewire yang rusak jika ada
+rm -f "$HOME/.config/pipewire/pipewire.conf.d/99-input-denoising.conf" 2>/dev/null || true
+rm -rf "$HOME/.config/pipewire" 2>/dev/null || true
 
 # 2. Buat struktur folder
 log "Membuat struktur direktori..."
