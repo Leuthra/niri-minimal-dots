@@ -25,7 +25,7 @@ case "${1:-}" in
         echo "$CURRENT"
         ;;
     --toggle)
-        if [ "$CURRENT" -eq 80 ]; then
+        if [ "$CURRENT" = "80" ]; then
             NEW_LIMIT=100
         else
             NEW_LIMIT=80

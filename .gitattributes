@@ -1,0 +1,29 @@
+# Enforce Linux line endings (LF) across all text files
+* text=auto eol=lf
+
+*.sh text eol=lf
+*.bash text eol=lf
+*.py text eol=lf
+*.kdl text eol=lf
+*.conf text eol=lf
+*.json text eol=lf
+*.jsonc text eol=lf
+*.toml text eol=lf
+*.ini text eol=lf
+*.css text eol=lf
+*.lua text eol=lf
+*.desktop text eol=lf
+*.txt text eol=lf
+*.md text eol=lf
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
