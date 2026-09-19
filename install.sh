@@ -74,8 +74,11 @@ if [ -f "$DOTFILES_DIR/packages.txt" ]; then
     else
         log "Menginstal ${#PKG_ARRAY[@]} paket..."
         if ! sudo dnf install -y "${PKG_ARRAY[@]}"; then
-            warn "Instalasi paket gagal. Periksa nama paket Fedora di packages.txt."
-            exit 1
+            warn "Instalasi ketat gagal, mencoba kembali dengan --setopt=strict=0 (abaikan paket yang tidak ditemukan)..."
+            if ! sudo dnf install -y --setopt=strict=0 "${PKG_ARRAY[@]}"; then
+                warn "Instalasi paket gagal. Periksa koneksi atau repository Fedora."
+                exit 1
+            fi
         fi
         
         # Enable bluetooth service if installed

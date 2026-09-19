@@ -5,7 +5,6 @@ fuzzel
 mako
 swaybg
 swaylock
-hyprlock
 swayidle
 xdg-desktop-portal-gnome
 
