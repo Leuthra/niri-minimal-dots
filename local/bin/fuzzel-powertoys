@@ -23,7 +23,7 @@ for d in \
     [ -d "$d" ] && APP_DIRS+=("$d")
 done
 
-APPS=$(find "${APP_DIRS[@]}" -name "*.desktop" 2>/dev/null | while read -r file; do
+APPS=$(find -L "${APP_DIRS[@]}" -name "*.desktop" 2>/dev/null | while read -r file; do
     grep -qi "^NoDisplay=true" "$file" 2>/dev/null && continue
     name=$(grep -m 1 "^Name=" "$file" 2>/dev/null | cut -d= -f2- | tr -d '\r')
     [ -n "$name" ] && echo "$name"
@@ -84,10 +84,30 @@ case "$CHOICE" in
         ;;
 esac
 
-# 5. Desktop Application launch (exact or case-insensitive search across all app dirs)
-DESKTOP_FILE=$(grep -rilm 1 "^Name=$CHOICE$" "${APP_DIRS[@]}" 2>/dev/null | head -n 1)
+# 5. Desktop Application launch
+# First, exact match on Name
+DESKTOP_FILE=$(find -L "${APP_DIRS[@]}" -name "*.desktop" 2>/dev/null | while read -r file; do
+    name=$(grep -m 1 "^Name=" "$file" 2>/dev/null | cut -d= -f2- | tr -d '\r')
+    if [ "$name" = "$CHOICE" ]; then
+        echo "$file"
+        break
+    fi
+done | head -n 1)
+
+# Fallback: case-insensitive Name match
 if [ -z "$DESKTOP_FILE" ]; then
-    DESKTOP_FILE=$(grep -riIlm 1 "^Name=.*$CHOICE" "${APP_DIRS[@]}" 2>/dev/null | head -n 1)
+    DESKTOP_FILE=$(find -L "${APP_DIRS[@]}" -name "*.desktop" 2>/dev/null | while read -r file; do
+        name=$(grep -m 1 "^Name=" "$file" 2>/dev/null | cut -d= -f2- | tr -d '\r')
+        if [[ "${name,,}" == "${CHOICE,,}" ]]; then
+            echo "$file"
+            break
+        fi
+    done | head -n 1)
+fi
+
+# Fallback: filename contains choice (e.g. 'obs' -> 'com.obsproject.Studio.desktop')
+if [ -z "$DESKTOP_FILE" ]; then
+    DESKTOP_FILE=$(find -L "${APP_DIRS[@]}" -iname "*$CHOICE*.desktop" 2>/dev/null | head -n 1)
 fi
 
 if [ -n "$DESKTOP_FILE" ]; then
@@ -105,21 +125,22 @@ if [ -n "$DESKTOP_FILE" ]; then
     fi
 fi
 
-# 6. Direct command or Flatpak app ID launch
+# 6. Direct command execution
 if command -v "$CHOICE" >/dev/null 2>&1; then
     "$CHOICE" &
     exit 0
 fi
 
+# 7. Flatpak app ID or Name search
 if command -v flatpak >/dev/null 2>&1; then
-    MATCHING_FLATPAK=$(flatpak list --app --columns=application 2>/dev/null | grep -i "$CHOICE" | head -n 1)
+    MATCHING_FLATPAK=$(flatpak list --app --columns=application,name 2>/dev/null | grep -i "$CHOICE" | awk '{print $1}' | head -n 1)
     if [ -n "$MATCHING_FLATPAK" ]; then
         flatpak run "$MATCHING_FLATPAK" &
         exit 0
     fi
 fi
 
-# 7. Automatic math fallback (e.g. user typed '15 * 40' without '=')
+# 8. Automatic math fallback (e.g. user typed '15 * 40' without '=')
 MATH_RESULT=$(python3 -c "import math; res = $CHOICE; print(res)" 2>/dev/null)
 if [ -n "$MATH_RESULT" ]; then
     echo -n "$MATH_RESULT" | wl-copy 2>/dev/null || true
@@ -127,6 +148,6 @@ if [ -n "$MATH_RESULT" ]; then
     exit 0
 fi
 
-# 8. Fallback to web search
-ENCODED=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$CHOICE")
-firefox "https://www.google.com/search?q=$ENCODED" &
+# 9. App / Command not found notification
+notify-send -i "dialog-error" "Launcher" "Command or app not found: $CHOICE\nTip: Use '? query' to search Google" 2>/dev/null || true
+exit 1
