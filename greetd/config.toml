@@ -1,6 +1,12 @@
 [terminal]
 vt = 1
 
-[default_session]
-command = "cage -s -- regreet"
+# Auto-login directly into Niri session (install.sh configures the user automatically)
+[initial_session]
+command = "niri-session"
 user = "greeter"
+
+[default_session]
+command = "niri-session"
+user = "greeter"
+

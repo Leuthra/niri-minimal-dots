@@ -254,7 +254,19 @@ if sudo dnf install -y greetd greetd-selinux cage regreet plymouth plymouth-syst
 
     if [ -d "$DOTFILES_DIR/greetd" ]; then
         sudo mkdir -p /etc/greetd
-        sudo cp -f "$DOTFILES_DIR/greetd/config.toml" /etc/greetd/config.toml
+        log "Configuring greetd autologin to Niri ($USER)..."
+        sudo tee /etc/greetd/config.toml >/dev/null <<EOF
+[terminal]
+vt = 1
+
+[initial_session]
+command = "niri-session"
+user = "$USER"
+
+[default_session]
+command = "niri-session"
+user = "$USER"
+EOF
         sudo cp -f "$DOTFILES_DIR/greetd/regreet.toml" /etc/greetd/regreet.toml
         sudo chmod -R 755 /etc/greetd
     fi

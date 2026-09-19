@@ -58,3 +58,6 @@ if [ -x "$POLKIT_AGENT" ]; then
 else
     echo "Warning: polkit-kde authentication agent not found."
 fi
+
+# Lock on startup (boot directly to lockscreen)
+(sleep 0.3 && "$HOME/.local/bin/lockscreen") &
