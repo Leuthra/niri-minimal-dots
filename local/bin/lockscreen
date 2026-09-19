@@ -1,7 +1,20 @@
 #!/bin/bash
 # Smart lockscreen for Niri Wayland session
-# Uses swaylock-effects (blur + clock) if available, otherwise swaylock with current wallpaper
+# Priority:
+# 1. hyprlock (Modern UI: live blur + digital clock + date + user greeting + styled input field)
+# 2. swaylock-effects (live blur + clock + date)
+# 3. swaylock (current wallpaper + Catppuccin Mocha ring theme)
 
+if command -v hyprlock >/dev/null 2>&1; then
+    CONFIG="$HOME/.config/hypr/hyprlock.conf"
+    if [ -f "$CONFIG" ]; then
+        exec hyprlock --config "$CONFIG"
+    else
+        exec hyprlock
+    fi
+fi
+
+# Detect wallpaper for swaylock
 WALLPAPER=""
 if [ -f "$HOME/.config/niri/current-wallpaper" ]; then
     SAVED_WALL=$(cat "$HOME/.config/niri/current-wallpaper" 2>/dev/null)

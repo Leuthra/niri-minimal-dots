@@ -454,7 +454,7 @@ fc-match "Cascadia Code NF"
 | Shell | [Fish](https://fishshell.com/) |
 | Prompt | [Starship](https://starship.rs/) |
 | Notifications | [Mako](https://github.com/emersion/mako) |
-| Lock Screen | [Swaylock](https://github.com/swaywm/swaylock) |
+| Lock Screen | [Hyprlock](https://github.com/hyprwm/hyprlock) / [Swaylock](https://github.com/swaywm/swaylock) |
 | Power Menu | Fuzzel custom |
 | Clipboard | [Cliphist](https://github.com/sentriz/cliphist) + [wl-clipboard](https://github.com/bugaevc/wl-clipboard) |
 | Screenshot | [Grim](https://sr.ht/~emersion/grim/) + [Slurp](https://wayland.emersion.fr/slurp/) + [Swappy](https://github.com/jtheoof/swappy) |
