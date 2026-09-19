@@ -1,8 +1,8 @@
 #!/bin/bash
 # PowerToys Run equivalent for Niri using Fuzzel
-# Features: Application Launcher, Web Search (? or g), Calculator (= or auto-math), Terminal Command (>), System Actions
+# Features: Application Launcher (native & flatpak), Web Search (? or g), Calculator (= or auto-math), Terminal Command (>), System Actions
 
-# Build initial list of quick actions and desktop apps
+# Build initial list of quick actions
 ACTIONS="🧮 Calculator: type '= 25 * 4'
 🔍 Web Search: type '? search query'
 ⚡ Run Command: type '> alacritty'
@@ -12,8 +12,20 @@ ACTIONS="🧮 Calculator: type '= 25 * 4'
 📋 Clipboard History
 ⏻ Power Menu"
 
-APPS=$(find /usr/share/applications "$HOME/.local/share/applications" -name "*.desktop" 2>/dev/null | while read -r file; do
-    name=$(grep -m 1 "^Name=" "$file" 2>/dev/null | cut -d= -f2)
+# Collect all desktop application directories (system, user, and flatpaks)
+APP_DIRS=()
+for d in \
+    "$HOME/.local/share/applications" \
+    "$HOME/.local/share/flatpak/exports/share/applications" \
+    "/var/lib/flatpak/exports/share/applications" \
+    "/usr/local/share/applications" \
+    "/usr/share/applications"; do
+    [ -d "$d" ] && APP_DIRS+=("$d")
+done
+
+APPS=$(find "${APP_DIRS[@]}" -name "*.desktop" 2>/dev/null | while read -r file; do
+    grep -qi "^NoDisplay=true" "$file" 2>/dev/null && continue
+    name=$(grep -m 1 "^Name=" "$file" 2>/dev/null | cut -d= -f2- | tr -d '\r')
     [ -n "$name" ] && echo "$name"
 done | sort -u)
 
@@ -72,15 +84,42 @@ case "$CHOICE" in
         ;;
 esac
 
-# 5. Desktop Application launch
-DESKTOP_FILE=$(grep -ril "^Name=$CHOICE$" /usr/share/applications "$HOME/.local/share/applications" 2>/dev/null | head -n 1)
+# 5. Desktop Application launch (exact or case-insensitive search across all app dirs)
+DESKTOP_FILE=$(grep -rilm 1 "^Name=$CHOICE$" "${APP_DIRS[@]}" 2>/dev/null | head -n 1)
+if [ -z "$DESKTOP_FILE" ]; then
+    DESKTOP_FILE=$(grep -riIlm 1 "^Name=.*$CHOICE" "${APP_DIRS[@]}" 2>/dev/null | head -n 1)
+fi
+
 if [ -n "$DESKTOP_FILE" ]; then
-    EXEC_CMD=$(grep -m 1 "^Exec=" "$DESKTOP_FILE" | cut -d= -f2- | sed 's/ %[a-zA-Z]//g')
-    eval "$EXEC_CMD" &
+    if command -v gio >/dev/null 2>&1; then
+        gio launch "$DESKTOP_FILE" &
+        exit 0
+    elif command -v gtk-launch >/dev/null 2>&1; then
+        app_id="$(basename "$DESKTOP_FILE" .desktop)"
+        gtk-launch "$app_id" &
+        exit 0
+    else
+        EXEC_CMD=$(grep -m 1 "^Exec=" "$DESKTOP_FILE" | cut -d= -f2- | sed 's/ %[a-zA-Z]//g')
+        eval "$EXEC_CMD" &
+        exit 0
+    fi
+fi
+
+# 6. Direct command or Flatpak app ID launch
+if command -v "$CHOICE" >/dev/null 2>&1; then
+    "$CHOICE" &
     exit 0
 fi
 
-# 6. Automatic math fallback (e.g. user typed '15 * 40' without '=')
+if command -v flatpak >/dev/null 2>&1; then
+    MATCHING_FLATPAK=$(flatpak list --app --columns=application 2>/dev/null | grep -i "$CHOICE" | head -n 1)
+    if [ -n "$MATCHING_FLATPAK" ]; then
+        flatpak run "$MATCHING_FLATPAK" &
+        exit 0
+    fi
+fi
+
+# 7. Automatic math fallback (e.g. user typed '15 * 40' without '=')
 MATH_RESULT=$(python3 -c "import math; res = $CHOICE; print(res)" 2>/dev/null)
 if [ -n "$MATH_RESULT" ]; then
     echo -n "$MATH_RESULT" | wl-copy 2>/dev/null || true
@@ -88,6 +127,6 @@ if [ -n "$MATH_RESULT" ]; then
     exit 0
 fi
 
-# 7. Fallback to web search
+# 8. Fallback to web search
 ENCODED=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1]))" "$CHOICE")
 firefox "https://www.google.com/search?q=$ENCODED" &

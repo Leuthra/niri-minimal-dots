@@ -112,16 +112,20 @@ fi
 # Flatpak Flathub, OnlyOffice & Vesktop
 if command -v flatpak >/dev/null 2>&1; then
     log "Mengonfigurasi Flathub..."
-    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null || true
+    flatpak remote-add --if-not-exists --user flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null || \
+    sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null || true
 
     log "Memeriksa instalasi OnlyOffice Desktop Editors (Flatpak)..."
-    flatpak install -y --noninteractive flathub org.onlyoffice.desktopeditors 2>/dev/null || warn "Gagal menginstal OnlyOffice via Flatpak."
+    flatpak install -y --noninteractive flathub org.onlyoffice.desktopeditors 2>/dev/null || \
+    flatpak install -y --user --noninteractive flathub org.onlyoffice.desktopeditors 2>/dev/null || warn "Gagal menginstal OnlyOffice via Flatpak."
 
     log "Memeriksa instalasi Vesktop Discord (Flatpak)..."
-    flatpak install -y --noninteractive flathub dev.vencord.Vesktop 2>/dev/null || warn "Gagal menginstal Vesktop via Flatpak."
+    flatpak install -y --noninteractive flathub dev.vencord.Vesktop 2>/dev/null || \
+    flatpak install -y --user --noninteractive flathub dev.vencord.Vesktop 2>/dev/null || warn "Gagal menginstal Vesktop via Flatpak."
 
     log "Memeriksa instalasi Bruno API Client (Flatpak)..."
-    flatpak install -y --noninteractive flathub com.usebruno.Bruno 2>/dev/null || warn "Gagal menginstal Bruno via Flatpak."
+    flatpak install -y --noninteractive flathub com.usebruno.Bruno 2>/dev/null || \
+    flatpak install -y --user --noninteractive flathub com.usebruno.Bruno 2>/dev/null || warn "Gagal menginstal Bruno via Flatpak."
 fi
 
 # Install Starship separately because it may not exist in Fedora repositories
