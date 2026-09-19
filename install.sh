@@ -316,7 +316,16 @@ fi
 
 chmod 700 "$HOME" 2>/dev/null || true
 
-# 10. Camera privacy permissions & portal reset
+# 10. Systemd journal memory and disk limits
+log "Configuring systemd-journald memory and disk limits..."
+if [ -d "$DOTFILES_DIR/systemd/journald.conf.d" ]; then
+    sudo mkdir -p /etc/systemd/journald.conf.d
+    sudo cp -f "$DOTFILES_DIR/systemd/journald.conf.d/"*.conf /etc/systemd/journald.conf.d/
+    sudo systemctl restart systemd-journald 2>/dev/null || true
+    sudo journalctl --vacuum-size=50M >/dev/null 2>&1 || true
+fi
+
+# 11. Camera privacy permissions & portal reset
 log "Configuring camera permissions..."
 if command -v gsettings >/dev/null 2>&1; then
     gsettings set org.gnome.desktop.privacy disable-camera false 2>/dev/null || true
