@@ -2,8 +2,26 @@
 # fuzzel-wallpaper - Interactive & Random wallpaper switcher
 # Supports: swaybg, swww, hyprpaper
 
-WALLDIR="${FUZZEL_WALLPAPER_DIR:-$HOME/.config/wallpapers}"
-[ -d "$WALLDIR" ] || [ ! -d "$HOME/Pictures/wallpapers" ] || WALLDIR="$HOME/Pictures/wallpapers"
+# Search candidate directories in order of preference
+CANDIDATES=(
+    "${FUZZEL_WALLPAPER_DIR:-}"
+    "$HOME/.config/wallpapers"
+    "$HOME/niri-minimal-dots/wallpapers"
+    "$HOME/.dotfiles/wallpapers"
+    "$HOME/Pictures/wallpapers"
+)
+
+WALLDIR=""
+for d in "${CANDIDATES[@]}"; do
+    [ -n "$d" ] && [ -d "$d" ] || continue
+    # Verify directory contains images (using -L to follow symlinks)
+    if find -L "$d/" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" -o -iname "*.webp" \) 2>/dev/null | grep -q .; then
+        WALLDIR="$d"
+        break
+    fi
+done
+
+[ -z "$WALLDIR" ] && WALLDIR="$HOME/.config/wallpapers"
 STATE_FILE="$HOME/.config/niri/current-wallpaper"
 
 mkdir -p "$(dirname "$STATE_FILE")"
@@ -43,27 +61,24 @@ set_wallpaper() {
     notify-send -i "preferences-desktop-wallpaper" "Wallpaper Changed" "$name" 2>/dev/null || true
 }
 
-if [ ! -d "$WALLDIR" ]; then
-    notify-send "Wallpaper" "Wallpaper directory not found: $WALLDIR" 2>/dev/null
-    exit 1
-fi
-
 SETTER=$(detect_setter)
 
 case "${1:-}" in
     --random|-r)
-        mapfile -t WALLS < <(find "$WALLDIR" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" -o -iname "*.webp" \))
+        mapfile -t WALLS < <(find -L "$WALLDIR/" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" -o -iname "*.webp" \) 2>/dev/null)
         if [ ${#WALLS[@]} -gt 0 ]; then
             RANDOM_WALL="${WALLS[RANDOM % ${#WALLS[@]}]}"
             set_wallpaper "$RANDOM_WALL" "$SETTER"
+        else
+            notify-send "Wallpaper" "No images found in $WALLDIR" 2>/dev/null
         fi
         exit 0
         ;;
     "")
         command -v fuzzel >/dev/null 2>&1 || { echo "fuzzel not found"; exit 1; }
-        mapfile -t LIST < <(find "$WALLDIR" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" -o -iname "*.webp" \) -exec basename {} \;)
+        mapfile -t LIST < <(find -L "$WALLDIR/" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.png" -o -iname "*.jpeg" -o -iname "*.webp" \) -exec basename {} \; 2>/dev/null)
         if [ ${#LIST[@]} -eq 0 ]; then
-            notify-send "Wallpaper" "No images found in $WALLDIR"
+            notify-send "Wallpaper" "No images found in $WALLDIR" 2>/dev/null
             exit 0
         fi
         CHOSEN=$(printf '%s\n' "${LIST[@]}" | fuzzel --dmenu --prompt="Wallpaper: " --width=30)
