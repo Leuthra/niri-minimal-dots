@@ -5,6 +5,11 @@
 # 2. swaylock-effects (live blur + clock + date)
 # 3. swaylock (current wallpaper + Catppuccin Mocha ring theme)
 
+# Don't launch if already locked
+if pgrep -x hyprlock >/dev/null 2>&1 || pgrep -x swaylock >/dev/null 2>&1; then
+    exit 0
+fi
+
 if command -v hyprlock >/dev/null 2>&1; then
     CONFIG="$HOME/.config/hypr/hyprlock.conf"
     if [ -f "$CONFIG" ]; then

@@ -3,10 +3,10 @@
 
 CONFIG_FILE="$HOME/.config/niri/idle.conf"
 
-# Defaults if not configured
-LOCK_TIMEOUT=300
-SCREEN_OFF_TIMEOUT=600
-SUSPEND_TIMEOUT=1200
+# Defaults if not configured (180s = 3m lock, 240s = 4m screen off, 900s = 15m suspend)
+LOCK_TIMEOUT=180
+SCREEN_OFF_TIMEOUT=240
+SUSPEND_TIMEOUT=900
 
 if [ -f "$CONFIG_FILE" ]; then
     # shellcheck source=/dev/null
