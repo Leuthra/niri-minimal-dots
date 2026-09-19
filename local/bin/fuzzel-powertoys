@@ -48,7 +48,7 @@ fi
 # 4. Quick Action matches
 case "$CHOICE" in
     "🔒 Lock Screen")
-        swaylock -f
+        lockscreen
         exit 0
         ;;
     "⏾ Suspend / Sleep")

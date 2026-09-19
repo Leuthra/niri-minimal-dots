@@ -1,0 +1,38 @@
+#!/bin/bash
+# Smart lockscreen for Niri Wayland session
+# Uses swaylock-effects (blur + clock) if available, otherwise swaylock with current wallpaper
+
+WALLPAPER=""
+if [ -f "$HOME/.config/niri/current-wallpaper" ]; then
+    SAVED_WALL=$(cat "$HOME/.config/niri/current-wallpaper" 2>/dev/null)
+    [ -f "$SAVED_WALL" ] && WALLPAPER="$SAVED_WALL"
+fi
+
+if [ -z "$WALLPAPER" ]; then
+    for f in "$HOME/Pictures/wallpapers"/*; do
+        if [ -f "$f" ]; then
+            WALLPAPER="$f"
+            break
+        fi
+    done
+fi
+
+# Check if swaylock supports swaylock-effects features
+if swaylock --help 2>&1 | grep -q "effect-blur"; then
+    exec swaylock -f \
+        --screenshots \
+        --clock \
+        --indicator \
+        --indicator-radius 120 \
+        --indicator-thickness 14 \
+        --effect-blur 8x6 \
+        --datestr "%A, %d %B %Y" \
+        --timestr "%H:%M" \
+        --fade-in 0.2
+else
+    if [ -n "$WALLPAPER" ]; then
+        exec swaylock -f -i "$WALLPAPER" -s fill
+    else
+        exec swaylock -f
+    fi
+fi

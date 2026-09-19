@@ -39,9 +39,9 @@ pkill -x swayidle 2>/dev/null || true
 
 # Run swayidle
 exec swayidle -w \
-    timeout "$LOCK_TIMEOUT" 'swaylock -f' \
+    timeout "$LOCK_TIMEOUT" "$HOME/.local/bin/lockscreen" \
     timeout "$SCREEN_OFF_TIMEOUT" 'niri msg action power-off-monitors' \
         resume 'niri msg action power-on-monitors' \
     timeout "$SUSPEND_TIMEOUT" 'systemctl suspend' \
-    before-sleep 'swaylock -f' \
+    before-sleep "$HOME/.local/bin/lockscreen" \
     after-resume 'niri msg action power-on-monitors'

@@ -178,6 +178,7 @@ That's it. The installer handles:
 | Script | Description | Dependencies |
 |--------|-------------|--------------|
 | `powermenu` | Fuzzel-based power menu (Shutdown/Reboot/Suspend/Logout/Lock) | fuzzel, systemctl, swaylock |
+| `lockscreen` | Smart screen locker (wallpaper background or blur with swaylock-effects) | swaylock |
 | `set-wallpaper` | Interactive wallpaper picker & random switcher | fuzzel, swaybg |
 | `fuzzel-powertoys` | PowerToys Run (calc `= 2+2`, web `? query`, run `> cmd`) | fuzzel, python3, wl-copy |
 | `battery-threshold` | Set and toggle battery charge limit (80% / 100%) | sysfs, notify-send |

@@ -17,7 +17,7 @@ binds {
 
     // Power menu (Fuzzel custom)
     Mod+T { spawn-sh "$HOME/.local/bin/powermenu"; }
-    Mod+Alt+L hotkey-overlay-title="Lock Screen: swaylock" { spawn "swaylock" "-f"; }
+    Mod+Alt+L hotkey-overlay-title="Lock Screen" { spawn-sh "$HOME/.local/bin/lockscreen"; }
     Mod+Shift+P hotkey-overlay-title="Suspend/Sleep PC" { spawn "systemctl" "suspend"; }
     Mod+Alt+I hotkey-overlay-title="Toggle Idle/Caffeine Mode" { spawn-sh "$HOME/.local/bin/idle-manager --toggle"; }
 
