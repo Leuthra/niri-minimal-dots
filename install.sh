@@ -265,7 +265,8 @@ if sudo dnf install -y greetd greetd-selinux cage regreet plymouth plymouth-syst
     fi
 
     if command -v greetd >/dev/null 2>&1 && command -v cage >/dev/null 2>&1 && command -v regreet >/dev/null 2>&1; then
-        log "Enabling greetd service..."
+        log "Enabling greetd service and graphical target..."
+        sudo systemctl set-default graphical.target 2>/dev/null || true
         sudo systemctl disable gdm.service 2>/dev/null || true
         sudo systemctl disable sddm.service 2>/dev/null || true
         sudo systemctl enable greetd.service 2>/dev/null || true
