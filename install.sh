@@ -382,9 +382,11 @@ if command -v flatpak >/dev/null 2>&1; then
     flatpak permission-set devices camera org.gnome.Snapshot yes 2>/dev/null || true
 fi
 
-# 11. Restart Portal Services
-log "Restarting portal services..."
-systemctl --user restart pipewire.service wireplumber.service 2>/dev/null || true
+# 11. Restart Audio & Portal Services
+log "Restarting audio & portal services..."
+rm -rf "$HOME/.config/pipewire" 2>/dev/null || true
+systemctl --user reset-failed pipewire.service wireplumber.service pipewire-pulse.service 2>/dev/null || true
+systemctl --user restart pipewire.service wireplumber.service pipewire-pulse.service 2>/dev/null || true
 systemctl --user restart xdg-desktop-portal.service 2>/dev/null || true
 systemctl --user restart xdg-desktop-portal-gnome.service 2>/dev/null || true
 
