@@ -352,15 +352,28 @@ if command -v gsettings >/dev/null 2>&1; then
     gsettings set org.gnome.desktop.privacy disable-camera false 2>/dev/null || true
 fi
 
-if command -v dbus-send >/dev/null 2>&1; then
-    dbus-send --session --print-reply --dest=org.freedesktop.impl.portal.PermissionStore \
+if command -v busctl >/dev/null 2>&1; then
+    # Reset generic denied camera permission
+    busctl --user call org.freedesktop.impl.portal.PermissionStore \
         /org/freedesktop/impl/portal/PermissionStore \
-        org.freedesktop.impl.portal.PermissionStore.DeletePermission \
-        string:'devices' string:'camera' string:'' 2>/dev/null || true
+        org.freedesktop.impl.portal.PermissionStore \
+        DeletePermission ss s "devices" "camera" "" 2>/dev/null || true
+
+    # Explicitly grant camera permission in portal PermissionStore
+    busctl --user call org.freedesktop.impl.portal.PermissionStore \
+        /org/freedesktop/impl/portal/PermissionStore \
+        org.freedesktop.impl.portal.PermissionStore \
+        SetPermission ssbays "devices" true "camera" "" 1 "yes" 2>/dev/null || true
+
+    busctl --user call org.freedesktop.impl.portal.PermissionStore \
+        /org/freedesktop/impl/portal/PermissionStore \
+        org.freedesktop.impl.portal.PermissionStore \
+        SetPermission ssbays "devices" true "camera" "org.gnome.Snapshot" 1 "yes" 2>/dev/null || true
 fi
 
 if command -v flatpak >/dev/null 2>&1; then
     flatpak permission-reset org.gnome.Snapshot 2>/dev/null || true
+    flatpak permission-set devices camera org.gnome.Snapshot yes 2>/dev/null || true
 fi
 
 # 11. Restart Portal Services

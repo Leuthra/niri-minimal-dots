@@ -69,6 +69,9 @@ flatpak
 # ── Multimedia & Camera ────────────────────────────────────────
 pipewire-alsa
 pipewire-pulseaudio
+pipewire-gstreamer
+pipewire-v4l2
+pipewire-plugin-libcamera
 playerctl
 cava
 mpv
