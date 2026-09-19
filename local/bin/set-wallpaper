@@ -2,7 +2,8 @@
 # fuzzel-wallpaper - Interactive & Random wallpaper switcher
 # Supports: swaybg, swww, hyprpaper
 
-WALLDIR="${FUZZEL_WALLPAPER_DIR:-$HOME/Pictures/wallpapers}"
+WALLDIR="${FUZZEL_WALLPAPER_DIR:-$HOME/.config/wallpapers}"
+[ -d "$WALLDIR" ] || [ ! -d "$HOME/Pictures/wallpapers" ] || WALLDIR="$HOME/Pictures/wallpapers"
 STATE_FILE="$HOME/.config/niri/current-wallpaper"
 
 mkdir -p "$(dirname "$STATE_FILE")"

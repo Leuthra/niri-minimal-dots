@@ -38,7 +38,6 @@ fi
 IGNORE_DIRS=(
     ".git"
     "Screenshots"
-    "wallpapers"
     "local"
     "nvim"
     "xdg-desktop-portal"
@@ -157,9 +156,11 @@ fi
 
 # 2. Buat struktur folder
 log "Membuat struktur direktori..."
-mkdir -p ~/.config ~/.local/bin
-mkdir -p ~/Pictures/wallpapers ~/Pictures/Screenshots
+mkdir -p ~/.config ~/.local/bin ~/.local/share/screenshots
 mkdir -p ~/.config/xdg-desktop-portal
+if [ -d "$HOME/Pictures" ]; then
+    mkdir -p "$HOME/Pictures/Screenshots"
+fi
 
 # 3. Symlink konfigurasi utama (Idempotent)
 log "Melakukan symlink konfigurasi ke ~/.config..."
@@ -220,11 +221,8 @@ if [ -d "$DOTFILES_DIR/local/share/applications" ]; then
     done
 fi
 
-# 5. Salin wallpaper & pengaturan MIME
+# 5. Salin pengaturan MIME & portal
 log "Menyalin file statis..."
-if [ -d "$DOTFILES_DIR/wallpapers" ]; then
-    cp -f "$DOTFILES_DIR"/wallpapers/* "$HOME/Pictures/wallpapers/"
-fi
 
 if [ -f "$DOTFILES_DIR/mimeapps.list" ]; then
     cp -f "$DOTFILES_DIR/mimeapps.list" "$HOME/.config/mimeapps.list"

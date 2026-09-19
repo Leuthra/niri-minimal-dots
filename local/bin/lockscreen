@@ -22,7 +22,7 @@ if [ -f "$HOME/.config/niri/current-wallpaper" ]; then
 fi
 
 if [ -z "$WALLPAPER" ]; then
-    for f in "$HOME/Pictures/wallpapers"/*; do
+    for f in "$HOME/.config/wallpapers"/* "$HOME/Pictures/wallpapers"/*; do
         if [ -f "$f" ]; then
             WALLPAPER="$f"
             break

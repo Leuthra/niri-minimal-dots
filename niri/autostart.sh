@@ -32,7 +32,9 @@ fi
 
 if [ -n "${WALL:-}" ] && [ -f "$WALL" ]; then
     swaybg -i "$WALL" -m fill &
-else
+elif [ -f "$HOME/.config/wallpapers/forest_dark_winter.jpg" ]; then
+    swaybg -i "$HOME/.config/wallpapers/forest_dark_winter.jpg" -m fill &
+elif [ -f "$HOME/Pictures/wallpapers/forest_dark_winter.jpg" ]; then
     swaybg -i "$HOME/Pictures/wallpapers/forest_dark_winter.jpg" -m fill &
 fi
 
