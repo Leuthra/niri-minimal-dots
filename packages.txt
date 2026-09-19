@@ -72,7 +72,6 @@ pipewire-pulseaudio
 pipewire-gstreamer
 pipewire-v4l2
 pipewire-plugin-libcamera
-easyeffects
 playerctl
 cava
 mpv

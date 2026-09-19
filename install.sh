@@ -164,37 +164,8 @@ if ! command -v zed >/dev/null 2>&1 && [ ! -f "$HOME/.local/bin/zed" ]; then
     fi
 fi
 
-# Install LADSPA RNNoise plugin untuk PipeWire (Noise Canceling Microphone)
-log "Memeriksa LADSPA Noise Suppression plugin (librnnoise_ladspa.so)..."
-if [ ! -f "/usr/lib64/ladspa/librnnoise_ladspa.so" ] && [ ! -f "/usr/lib/ladspa/librnnoise_ladspa.so" ]; then
-    log "Menginstal LADSPA RNNoise plugin..."
-    if sudo dnf copr enable -y lkiesow/noise-suppression-for-voice 2>/dev/null && sudo dnf install -y ladspa-realtime-noise-suppression-plugin 2>/dev/null; then
-        log "LADSPA plugin berhasil dipasang via COPR."
-    fi
-
-    # Jika COPR gagal / tidak tersedia untuk versi Fedora tertentu, unduh precompiled binary resmi dari GitHub release
-    if [ ! -f "/usr/lib64/ladspa/librnnoise_ladspa.so" ] && [ ! -f "/usr/lib/ladspa/librnnoise_ladspa.so" ]; then
-        log "Mengunduh librnnoise_ladspa.so resmi dari GitHub upstream..."
-        TMP_DIR=$(mktemp -d)
-        if curl -sSL -o "$TMP_DIR/linux-rnnoise.zip" "https://github.com/werman/noise-suppression-for-voice/releases/download/v1.03/linux-rnnoise.zip"; then
-            unzip -qo "$TMP_DIR/linux-rnnoise.zip" -d "$TMP_DIR"
-            sudo mkdir -p /usr/lib64/ladspa /usr/lib/ladspa
-            if [ -f "$TMP_DIR/linux-rnnoise/ladspa/librnnoise_ladspa.so" ]; then
-                sudo cp -f "$TMP_DIR/linux-rnnoise/ladspa/librnnoise_ladspa.so" /usr/lib64/ladspa/
-                sudo cp -f "$TMP_DIR/linux-rnnoise/ladspa/librnnoise_ladspa.so" /usr/lib/ladspa/
-                sudo chmod 755 /usr/lib64/ladspa/librnnoise_ladspa.so /usr/lib/ladspa/librnnoise_ladspa.so
-                log "LADSPA RNNoise plugin berhasil dipasang ke /usr/lib64/ladspa/."
-            fi
-        fi
-        rm -rf "$TMP_DIR"
-    fi
-fi
-
-# Lindungi PipeWire dari crash: jika plugin belum terpasang, jangan pasang config denoising
-if [ ! -f "/usr/lib64/ladspa/librnnoise_ladspa.so" ] && [ ! -f "/usr/lib/ladspa/librnnoise_ladspa.so" ]; then
-    warn "Plugin librnnoise_ladspa.so tidak ditemukan. Melewati config denoising PipeWire agar audio tidak crash."
-    rm -f "$HOME/.config/pipewire/pipewire.conf.d/99-input-denoising.conf" 2>/dev/null || true
-fi
+# Pastikan konfigurasi pipewire custom dibersihkan total
+rm -rf "$HOME/.config/pipewire" 2>/dev/null || true
 
 # 2. Buat struktur folder
 log "Membuat struktur direktori..."
