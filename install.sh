@@ -139,6 +139,14 @@ if ! command -v starship >/dev/null 2>&1; then
     fi
 fi
 
+# Install Hyprlock (modern lockscreen dengan blur, clock, date, dan user avatar)
+if ! command -v hyprlock >/dev/null 2>&1; then
+    log "Menginstal Hyprlock untuk modern lockscreen..."
+    if sudo dnf copr enable -y sdegler/hyprland 2>/dev/null; then
+        sudo dnf install -y hyprlock 2>/dev/null || warn "Gagal menginstal hyprlock dari COPR sdegler/hyprland."
+    fi
+fi
+
 # Install Zed editor if not installed
 if ! command -v zed >/dev/null 2>&1 && [ ! -f "$HOME/.local/bin/zed" ]; then
     log "Menginstal Zed editor..."
